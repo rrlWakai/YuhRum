@@ -173,9 +173,11 @@ function App() {
             <a href="#contact" className="transition-colors hover:text-neutral-950">Contact</a>
           </div>
           <div className="flex items-center gap-3">
-            <CTAButton href="#final-cta" className="hidden px-5 py-2 text-xs md:flex">
-              Book Now
-            </CTAButton>
+            <div className="hidden md:block">
+              <CTAButton href="#final-cta" className="px-5 py-2 text-xs">
+                Book Now
+              </CTAButton>
+            </div>
             <button
               onClick={() => setMenuOpen((v) => !v)}
               className="flex size-10 items-center justify-center rounded-md border border-gray-200 text-neutral-700 transition-colors hover:bg-gray-50 md:hidden"
@@ -227,7 +229,7 @@ function App() {
           className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1800&q=80')] bg-cover bg-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/60" />
-        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1240px] flex-col justify-between px-6 pb-10 pt-32 sm:pt-40 md:pt-52 lg:pt-58 md:px-10 md:pb-12">
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1240px] flex-col px-6 pb-10 pt-32 sm:pt-40 md:pt-52 lg:pt-58 md:px-10 md:pb-12">
           <motion.div
             initial="hidden"
             animate="show"
@@ -269,7 +271,7 @@ function App() {
           <motion.div
             animate={{ y: [0, 9, 0], opacity: [0.42, 1, 0.42] }}
             transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-            className="self-center flex items-center gap-3 text-xs uppercase tracking-[0.25em] text-white/70"
+            className="mt-auto self-center flex items-center gap-3 pt-16 text-xs uppercase tracking-[0.25em] text-white/70 md:pt-24"
           >
             <span className="h-px w-10 bg-white/50" />
             Scroll to Discover
@@ -298,7 +300,7 @@ function App() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.35 }}
               transition={{ duration: 0.65, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -bottom-10 -right-6 z-20 hidden max-w-[15rem] border border-gray-200 bg-white p-5 sm:block md:-right-12 md:max-w-xs md:p-6"
+              className="absolute -bottom-10 -right-6 z-20 hidden max-w-[15rem] border border-gray-200 bg-white p-5 sm:block md:max-w-xs md:p-6 lg:-right-12"
             >
               <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Editorial Stay</p>
               <p className="mt-3 font-serif text-2xl text-neutral-900">Architectural calm meets ocean ritual.</p>
