@@ -29,7 +29,7 @@ export function AnimatedText({ title, description, align = 'left', light = false
           show: { opacity: 1, y: 0 },
         }}
         transition={{ duration: 0.6, delay: 0.1, ease: 'easeInOut' }}
-        className={`font-serif text-4xl leading-tight md:text-5xl ${light ? 'text-neutral-950' : 'text-neutral-950'}`}
+        className={`font-serif text-3xl leading-tight sm:text-4xl md:text-5xl ${light ? 'text-neutral-950' : 'text-neutral-950'}`}
       >
         {title}
       </motion.h2>

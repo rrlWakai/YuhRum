@@ -25,7 +25,7 @@ export function ParallaxSection({
   const fgY = useTransform(scrollYProgress, [0, 1], fgSpeed);
 
   return (
-    <section id={id} className={`relative w-full overflow-visible py-28 md:py-36 ${className}`}>
+    <section id={id} className={`relative w-full overflow-visible py-16 sm:py-20 md:py-28 lg:py-36 ${className}`}>
       <motion.div style={{ y: bgY }} className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <img src={image} alt={imageAlt} className="h-full w-full object-cover" />
       </motion.div>

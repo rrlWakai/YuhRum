@@ -58,7 +58,7 @@ export function RoomCarousel({ rooms }: RoomCarouselProps) {
             animate={{ scale: activeIndex === index ? 1.03 : 0.96 }}
             className="group relative min-w-[82%] snap-center overflow-hidden border border-gray-200 bg-white md:min-w-[58%] xl:min-w-[42%]"
           >
-            <div className="relative h-[540px] overflow-hidden">
+            <div className="relative h-[360px] sm:h-[440px] md:h-[540px] overflow-hidden">
               <motion.img
                 src={room.image}
                 alt={room.name}

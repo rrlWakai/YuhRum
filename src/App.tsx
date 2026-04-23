@@ -227,7 +227,7 @@ function App() {
           className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1800&q=80')] bg-cover bg-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/60" />
-        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1240px] flex-col justify-between px-6 pb-12 pt-58 md:px-10">
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1240px] flex-col justify-between px-6 pb-10 pt-32 sm:pt-40 md:pt-52 lg:pt-58 md:px-10 md:pb-12">
           <motion.div
             initial="hidden"
             animate="show"
@@ -241,7 +241,7 @@ function App() {
                 show: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.65, ease: 'easeInOut', delay: 0.2 }}
-              className="mt-5 font-serif text-5xl leading-[0.96] text-white md:text-7xl"
+              className="mt-4 font-serif text-[2rem] leading-[1.05] text-white sm:text-5xl sm:leading-[0.96] md:text-6xl lg:text-7xl"
             >
               A sanctuary where every horizon is privately yours.
             </motion.h1>
@@ -251,7 +251,7 @@ function App() {
                 show: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.6, ease: 'easeInOut', delay: 0.3 }}
-              className="mt-8 max-w-xl text-base leading-relaxed text-white/85 md:text-lg"
+              className="mt-5 max-w-xl text-sm leading-relaxed text-white/85 md:mt-8 md:text-base lg:text-lg"
             >
               Enter an immersive coastline retreat crafted for those who value stillness, privacy,
               and effortless sophistication.
@@ -260,7 +260,7 @@ function App() {
               initial={{ opacity: 0, scale: 0.97, y: 34 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.6, ease: 'easeInOut', delay: 0.4 }}
-              className="mt-9"
+              className="mt-6 md:mt-9"
             >
               <CTAButton>Book Now</CTAButton>
             </motion.div>
@@ -285,7 +285,7 @@ function App() {
               style={{ y: aboutImageY }}
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.6, ease: 'easeInOut' }}
-              className="relative h-[560px] overflow-hidden border border-gray-200"
+              className="relative h-64 overflow-hidden border border-gray-200 sm:h-80 md:h-[420px] lg:h-[560px]"
             >
               <img
                 src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1400&q=80"
@@ -298,15 +298,15 @@ function App() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.35 }}
               transition={{ duration: 0.65, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -bottom-10 -right-6 z-20 max-w-xs border border-gray-200 bg-white p-6 md:-right-12"
+              className="absolute -bottom-10 -right-6 z-20 hidden max-w-[15rem] border border-gray-200 bg-white p-5 sm:block md:-right-12 md:max-w-xs md:p-6"
             >
               <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Editorial Stay</p>
               <p className="mt-3 font-serif text-2xl text-neutral-900">Architectural calm meets ocean ritual.</p>
             </motion.div>
           </Reveal>
-          <Reveal delay={0.18} className="pt-8 lg:pt-20">
+          <Reveal delay={0.18} className="pt-2 sm:pt-6 lg:pt-20">
             <p className="text-xs uppercase tracking-[0.22em] text-gray-600">The Yuhrum Narrative</p>
-            <h2 className="mt-5 font-serif text-4xl leading-tight text-neutral-950 md:text-6xl">
+            <h2 className="mt-4 font-serif text-3xl leading-tight text-neutral-950 sm:text-4xl md:text-5xl lg:text-6xl">
               Curated moments,
               <br />
               naturally unfolding.
@@ -333,7 +333,7 @@ function App() {
         <div className="mx-auto max-w-[1240px] px-6 md:px-10">
           <Reveal delay={0.05} className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-black/90">Accommodation</p>
-            <h2 className="mt-4 font-serif text-4xl leading-tight text-black md:text-6xl">
+            <h2 className="mt-4 font-serif text-3xl leading-tight text-black sm:text-4xl md:text-5xl lg:text-6xl">
               Rooms designed as private chapters.
             </h2>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-gray-700/85 md:text-lg">
@@ -352,7 +352,7 @@ function App() {
         <div className="mx-auto grid max-w-[1240px] items-start gap-14 lg:grid-cols-[0.9fr_1.1fr]">
           <Reveal delay={0.06} className="lg:sticky lg:top-28">
             <p className="text-xs uppercase tracking-[0.22em] text-gray-600">Signature Amenities</p>
-            <h2 className="mt-5 font-serif text-4xl leading-tight text-neutral-950 md:text-5xl">
+            <h2 className="mt-4 font-serif text-3xl leading-tight text-neutral-950 sm:text-4xl md:text-5xl">
               Crafted details with purposeful restraint.
             </h2>
             <p className="mt-6 max-w-md text-base leading-relaxed text-gray-700">
@@ -370,7 +370,7 @@ function App() {
                 transition: { staggerChildren: 0.12 },
               },
             }}
-            className="grid gap-6 md:grid-cols-2"
+            className="grid gap-4 sm:grid-cols-2 md:gap-6"
           >
             {amenities.map((amenity) => (
               <motion.div
@@ -392,7 +392,7 @@ function App() {
         <div className="mx-auto max-w-[1240px]">
           <Reveal delay={0.05} className="max-w-3xl">
             <p className="text-xs uppercase tracking-[0.22em] text-gray-600">Gallery</p>
-            <h2 className="mt-4 font-serif text-4xl text-neutral-950 md:text-6xl">
+            <h2 className="mt-4 font-serif text-3xl leading-tight text-neutral-950 sm:text-4xl md:text-5xl lg:text-6xl">
               A visual passage through Yuhrum.
             </h2>
             <p className="mt-6 text-base leading-relaxed text-gray-700 md:text-lg">
@@ -407,7 +407,7 @@ function App() {
               hidden: {},
               show: { transition: { staggerChildren: 0.08 } },
             }}
-            className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-12"
+            className="mt-8 grid grid-cols-1 gap-3 md:mt-14 md:grid-cols-12 md:gap-5"
           >
             {gallery.map((image, index) => (
               <motion.figure
@@ -436,7 +436,11 @@ function App() {
                   whileHover={{ scale: 1.04 }}
                   transition={{ duration: 0.55, ease: 'easeInOut' }}
                   className={`w-full object-cover ${
-                    index === 0 ? 'h-[34rem]' : index === 2 ? 'h-[20rem]' : 'h-72 md:h-80'
+                    index === 0
+                      ? 'h-52 sm:h-72 md:h-[28rem] lg:h-[34rem]'
+                      : index === 2
+                        ? 'h-40 sm:h-52 md:h-[20rem]'
+                        : 'h-44 sm:h-56 md:h-72 lg:h-80'
                   }`}
                 />
               </motion.figure>
@@ -451,10 +455,10 @@ function App() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.45 }}
           transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto -mb-20 max-w-[1240px] overflow-visible border border-gray-200 bg-white p-8 md:p-14"
+          className="relative mx-auto -mb-8 max-w-[1240px] overflow-visible border border-gray-200 bg-white p-7 sm:-mb-12 md:-mb-20 md:p-14"
         >
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-700">Limited Release</p>
-          <h3 className="mt-4 font-serif text-3xl text-neutral-950 md:text-5xl">
+          <h3 className="mt-3 font-serif text-2xl leading-tight text-neutral-950 sm:text-3xl md:text-5xl">
             Reserve four nights, receive a private sunset voyage and spa ritual for two.
           </h3>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-gray-700">
@@ -484,7 +488,7 @@ function App() {
               hidden: {},
               show: { transition: { staggerChildren: 0.12 } },
             }}
-            className="mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4"
+            className="mt-12 -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-4 md:-mx-10 md:gap-6 md:px-10"
           >
             {testimonials.map((item) => (
               <motion.div
@@ -532,7 +536,7 @@ function App() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.45 }}
             transition={{ duration: 0.8, ease: 'easeInOut', delay: 0.45 }}
-            className="mt-5 max-w-4xl font-serif text-4xl leading-tight text-white drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)] md:text-6xl"
+            className="mt-4 max-w-4xl font-serif text-3xl leading-tight text-white drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)] sm:text-4xl md:text-5xl lg:text-6xl"
           >
             Your private chapter begins now.
           </motion.h2>
@@ -561,7 +565,7 @@ function App() {
       </Section>
 
       <Section id="contact" className="border-t border-gray-200 bg-white">
-        <div className="mx-auto grid max-w-[1240px] gap-12 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-[1240px] gap-10 md:grid-cols-2 md:gap-12">
           <AnimatedText
             title="Contact Yuhrum Concierge"
             description="Tell us your travel dates and preferences. We will curate an itinerary designed around your pace, privacy, and purpose."
@@ -613,7 +617,7 @@ function App() {
             <iframe
               title="Yuhrum Resort Location"
               src="https://www.openstreetmap.org/export/embed.html?bbox=115.098%2C-8.876%2C115.296%2C-8.69&layer=mapnik"
-              className="h-[390px] w-full border-0"
+              className="h-56 w-full border-0 sm:h-72 md:h-[390px]"
               loading="lazy"
             />
             <div className="absolute left-6 top-6 rounded-md border border-gray-200 bg-white p-4">
@@ -624,8 +628,8 @@ function App() {
         </div>
       </Section>
 
-      <footer className="border-t border-gray-200 bg-white px-6 py-16 md:px-10">
-        <div className="mx-auto grid max-w-[1240px] gap-10 md:grid-cols-4">
+      <footer className="border-t border-gray-200 bg-white px-6 py-10 md:px-10 md:py-16">
+        <div className="mx-auto grid max-w-[1240px] gap-8 sm:grid-cols-2 md:grid-cols-4 md:gap-10">
           <div>
             <p className="font-serif text-3xl text-neutral-900">Yuhrum</p>
             <p className="mt-3 text-sm text-neutral-600">Crafted coastal stays for intentional travelers.</p>
@@ -662,13 +666,13 @@ function App() {
         </p>
       </footer>
 
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6">
         {chatOpen ? (
           <motion.aside
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.35, ease: 'easeInOut' }}
-            className="w-[320px] overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm md:w-[360px]"
+            className="w-[calc(100vw-3rem)] max-w-[320px] overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm sm:max-w-[360px]"
           >
             <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
               <div className="flex items-center gap-3">
