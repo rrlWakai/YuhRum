@@ -223,7 +223,7 @@ function App() {
         className="fixed left-0 top-0 z-50 h-0.5 w-full origin-left bg-neutral-900"
       />
 
-      <section className="relative min-h-screen overflow-hidden border-b border-gray-200">
+      <section className="relative min-h-[100vh] border-b border-gray-200">
         <motion.div
           style={{ y: heroBackgroundY }}
           className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1800&q=80')] bg-cover bg-center"
