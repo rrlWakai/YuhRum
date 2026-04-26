@@ -16,6 +16,8 @@
     "vite": "^8.0.9"
   },
   "dependencies": {
+    "@google/genai": "^1.50.1",
+    "@supabase/supabase-js": "^2.104.1",
     "@tailwindcss/vite": "^4.2.4",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",

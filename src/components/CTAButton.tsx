@@ -22,7 +22,7 @@ export function CTAButton({ children, href = '#final-cta', large = false, classN
         scale: 1.03,
       }}
       whileTap={{ scale: 0.98 }}
-      className={`flex w-fit items-center justify-center rounded-md border border-gray-200 bg-neutral-950 text-sm font-medium uppercase tracking-[0.15em] text-white ${
+      className={`flex w-fit items-center justify-center border border-gray-200 btn-navy text-sm font-medium uppercase tracking-[0.15em] text-white ${
         large ? 'px-11 py-4 text-base' : 'px-8 py-3'
       } ${className}`}
     >

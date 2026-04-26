@@ -4,7 +4,11 @@
 :root {
   font-family: "Inter", "Avenir Next", "Helvetica Neue", sans-serif;
   color: #1c1917;
-  background-color: #f8f3eb;
+  background-color: #ffffff;
+  --brand-navy: #0A192F;
+  --brand-navy-hover: #112240;
+  --brand-navy-light: #F0F4F8;
+  --brand-navy-border: #D1DEEA;
 }
 
 * {
@@ -20,11 +24,58 @@ body,
   scroll-behavior: smooth;
 }
 
-
 body {
-  background: #ffffff;
+  background: #F7F6F4;
 }
 
 .font-serif {
   font-family: "Cormorant Garamond", "Times New Roman", serif;
+}
+
+.btn-navy {
+  background-color: var(--brand-navy);
+  color: white;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+.btn-navy:hover {
+  background-color: var(--brand-navy-hover);
+  box-shadow: 0 8px 24px rgba(10, 25, 47, 0.25);
+  transform: translateY(-1px);
+}
+.btn-navy:active {
+  transform: translateY(0);
+}
+
+.villa-tag {
+  background-color: var(--brand-navy-light);
+  color: var(--brand-navy);
+  border: 1px solid var(--brand-navy-border);
+}
+
+.cal-day-blocked {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.cal-day-available {
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.cal-day-available:hover {
+  background-color: var(--brand-navy-light);
+  color: var(--brand-navy);
+}
+.cal-day-selected {
+  background-color: var(--brand-navy);
+  color: white;
+  border-radius: 50%;
+}
+.cal-day-in-range {
+  background-color: var(--brand-navy-light);
+  color: var(--brand-navy);
+}
+.cal-day-weekend {
+  color: #6b7280;
 }

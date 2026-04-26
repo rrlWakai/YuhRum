@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const { BedDouble, Users, Wifi } = require\\('./node_modules/lucide-react'\\); console.log\\('BedDouble:', !!BedDouble, 'Users:', !!Users, 'Wifi:', !!Wifi\\)\")",
+      "Bash(npm run *)"
+    ]
+  }
+}

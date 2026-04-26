@@ -1,12 +1,11 @@
 import { useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BedDouble, Maximize2, Users, Waves } from 'lucide-react';
+import { Sparkles, UtensilsCrossed, Users, Waves } from 'lucide-react';
 import { Reveal } from './Reveal';
 
 type Room = {
   name: string;
   category: string;
-  description: string;
   features: string;
   price: string;
   ctaLabel: string;
@@ -15,19 +14,20 @@ type Room = {
 
 type RoomCarouselProps = {
   rooms: Room[];
+  onSelect?: (index: number) => void;
 };
 
 function parseFeatures(features: string) {
-  const [guests, bed, view, size] = features.split('·').map((item) => item.trim());
+  const [guests, pool, kitchen, events] = features.split('·').map((item) => item.trim());
   return [
     { icon: Users, label: guests ?? '' },
-    { icon: BedDouble, label: bed ?? '' },
-    { icon: Waves, label: view ?? '' },
-    { icon: Maximize2, label: size ?? '' },
+    { icon: Waves, label: pool ?? '' },
+    { icon: UtensilsCrossed, label: kitchen ?? '' },
+    { icon: Sparkles, label: events ?? '' },
   ];
 }
 
-export function RoomCarousel({ rooms }: RoomCarouselProps) {
+export function RoomCarousel({ rooms, onSelect }: RoomCarouselProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -72,9 +72,6 @@ export function RoomCarousel({ rooms }: RoomCarouselProps) {
                 <Reveal delay={0.12}>
                   <h3 className="mt-3 font-serif text-4xl">{room.name}</h3>
                 </Reveal>
-                <Reveal delay={0.2}>
-                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/85">{room.description}</p>
-                </Reveal>
                 <Reveal delay={0.28}>
                   <div className="mt-5 grid grid-cols-2 gap-3 text-xs text-white/90">
                     {roomFeatures[index].map((feature) => (
@@ -88,7 +85,10 @@ export function RoomCarousel({ rooms }: RoomCarouselProps) {
                 <Reveal delay={0.36}>
                   <div className="mt-6 flex items-center justify-between">
                     <p className="text-sm text-white/90">{room.price}</p>
-                    <button className="border border-white px-5 py-2 text-[11px] uppercase tracking-[0.16em] text-white transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-white hover:text-neutral-900">
+                    <button
+                      onClick={() => onSelect?.(index)}
+                      className="border border-white px-5 py-2 text-[11px] uppercase tracking-[0.16em] text-white transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-white hover:text-neutral-900"
+                    >
                       {room.ctaLabel}
                     </button>
                   </div>
