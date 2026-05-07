@@ -337,6 +337,7 @@ export function HomePage({ onNavigate, onReserve }: Props) {
               >
                 <motion.img
                   src={image}
+                  loading="lazy"
                   alt="Villa gallery"
                   whileHover={{ scale: 1.04 }}
                   transition={{ duration: 0.55, ease: 'easeInOut' }}

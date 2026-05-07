@@ -292,6 +292,7 @@ export function VillaDetailPage({ villaId, onNavigate, onReserve }: Props) {
                 >
                   <img
                     src={img}
+                    loading="lazy"
                     alt={`${villa.name} gallery`}
                     className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                   />
@@ -413,13 +414,19 @@ export function VillaDetailPage({ villaId, onNavigate, onReserve }: Props) {
         </div>
       </Section>
 
-      <div className="sticky bottom-0 z-30 border-t border-gray-200 bg-white/95 px-6 py-4 backdrop-blur-md md:hidden">
-        <button
-          onClick={() => onReserve(villa.id)}
-          className="flex w-full items-center justify-center btn-navy py-3.5 text-xs font-medium uppercase tracking-[0.15em]"
-        >
-          Reserve the Villa
-        </button>
+      <div className="sticky bottom-0 z-30 border-t border-gray-100 bg-white/95 px-5 py-4 backdrop-blur-xl md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-500">Starts at</span>
+            <span className="font-serif text-xl text-[#0A192F] leading-none mt-1">{fmt(villa.rates.dayStay.weekday)}</span>
+          </div>
+          <button
+            onClick={() => onReserve(villa.id)}
+            className="flex-1 items-center justify-center rounded-xl bg-[#0A192F] py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-[#0A192F]/20 hover:bg-[#0A192F]/90 transition-all"
+          >
+            Reserve
+          </button>
+        </div>
       </div>
     </div>
   );
