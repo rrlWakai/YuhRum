@@ -91,7 +91,7 @@ Any date NOT in this list is available. Use this information to accurately answe
         }
       });
       
-      setMessages(prev => [...prev, { role: 'model', text: response.text }]);
+      setMessages(prev => [...prev, { role: 'model', text: response.text || 'I apologize, but I received an empty response. Please try again.' }]);
     } catch (error) {
       console.error(error);
       setMessages(prev => [...prev, { role: 'system', text: 'I apologize, but I am currently unavailable to respond. Please try again later.' }]);
