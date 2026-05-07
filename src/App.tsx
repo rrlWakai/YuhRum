@@ -6,6 +6,7 @@ import { HomePage } from './pages/HomePage';
 import { VillaDetailPage } from './pages/VillaDetailPage';
 import { GalleryPage } from './pages/GalleryPage';
 import { Chatbot } from './components/Chatbot';
+import { Loader } from './components/Loader';
 import { villas } from './data/villas';
 
 export type PageView =
@@ -20,6 +21,7 @@ function App() {
 
   const [page, setPage] = useState<PageView>({ type: 'home' });
   const [bookingVillaId, setBookingVillaId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   function navigate(p: PageView) {
     setPage(p);
@@ -41,6 +43,7 @@ function App() {
 
   return (
     <>
+      {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
       <Header
         page={page}
         onNavigate={navigate}

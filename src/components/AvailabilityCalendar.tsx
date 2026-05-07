@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { supabase } from '../lib/supabase';
 
 type Props = {
-  blockedDates?: string[];
   onRangeSelect?: (start: string, end: string) => void;
 };
 
@@ -40,18 +40,50 @@ function isInRange(y: number, m: number, d: number, start: string, end: string) 
   return date > new Date(start) && date < new Date(end);
 }
 
-const SAMPLE_BLOCKED: string[] = (() => {
-  const now = new Date();
-  const y = now.getFullYear();
-  const mo = now.getMonth();
-  return [
-    toKey(y, mo, 5), toKey(y, mo, 6), toKey(y, mo, 7),
-    toKey(y, mo, 14), toKey(y, mo, 15),
-    toKey(y, mo, 22), toKey(y, mo, 23), toKey(y, mo, 24),
-  ];
-})();
+export function AvailabilityCalendar({ onRangeSelect }: Props) {
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-export function AvailabilityCalendar({ blockedDates = SAMPLE_BLOCKED, onRangeSelect }: Props) {
+  useEffect(() => {
+    async function fetchAvailability() {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('bookings')
+          .select('check_in, check_out')
+          .in('status', ['confirmed', 'pending']);
+          
+        if (error) throw error;
+        
+        const blocked = new Set<string>();
+        
+        if (data) {
+          data.forEach(booking => {
+            const start = new Date(booking.check_in);
+            const end = new Date(booking.check_out);
+            
+            // Normalize time to midnight to avoid timezone issues
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+            
+            let current = new Date(start);
+            while (current < end) {
+              blocked.add(toKey(current.getFullYear(), current.getMonth(), current.getDate()));
+              current.setDate(current.getDate() + 1);
+            }
+          });
+        }
+        
+        setBlockedDates(Array.from(blocked));
+      } catch (err) {
+        console.error("Failed to fetch availability:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    fetchAvailability();
+  }, []);
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -73,6 +105,7 @@ export function AvailabilityCalendar({ blockedDates = SAMPLE_BLOCKED, onRangeSel
   }
 
   function handleDayClick(day: number) {
+    if (isLoading) return;
     const key = toKey(viewYear, viewMonth, day);
     if (blocked.has(key)) return;
     const isPast = isBefore(viewYear, viewMonth, day, today.getFullYear(), today.getMonth(), today.getDate());
@@ -122,9 +155,15 @@ export function AvailabilityCalendar({ blockedDates = SAMPLE_BLOCKED, onRangeSel
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-2xl border border-gray-200 bg-white p-6 shadow-md md:p-8"
+      className="rounded-2xl border border-gray-200 bg-white p-6 shadow-md md:p-8 relative overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-6">
+      {isLoading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+          <Loader2 className="size-8 animate-spin text-[#3D6B52]" />
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-6 relative z-0">
         <button
           onClick={prevMonth}
           className="flex size-9 items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
