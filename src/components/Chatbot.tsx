@@ -4,46 +4,24 @@ import { X, Send, Loader2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import yuhrumLogo from '../assets/yuhrumlogo.png';
 import { villas } from '../data/villas';
+import { useAvailability } from '../lib/hooks';
 
 type Message = {
   role: 'user' | 'model' | 'system';
   text: string;
 };
 
-// Initialize the SDK only if the key exists
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-let ai: GoogleGenAI | null = null;
-let chatSession: any = null;
 
-if (apiKey && apiKey !== 'your_api_key_here') {
-  try {
-    ai = new GoogleGenAI({ apiKey });
-    
-    // Prepare context about the villas
-    const villaContext = villas.map(v => `
-      Name: ${v.name}
-      Location: ${v.location}
-      Capacity: ${v.capacity.min}-${v.capacity.max} pax
-      Day Stay (Weekday: ${v.rates.dayStay.weekday}, Weekend: ${v.rates.dayStay.weekend})
-      Night Stay (Weekday: ${v.rates.nightStay.weekday}, Weekend: ${v.rates.nightStay.weekend})
-      Overnight (Weekday: ${v.rates.overnight.weekday}, Weekend: ${v.rates.overnight.weekend})
-      Amenities: ${v.amenities.outdoor.join(', ')}
-    `).join('\n\n');
-
-    chatSession = ai.chats.create({
-      model: 'gemini-2.5-flash',
-      config: {
-        systemInstruction: `You are the exclusive concierge and virtual assistant for Yuhrum Villas. 
-        Adopt a sophisticated, polite, and premium tone. Provide well-structured, easy-to-read answers. 
-        Do not use markdown formatting like asterisks (**). Use spacing and new lines for a clean layout.
-        Here is the villa information:\n${villaContext}`,
-        temperature: 0.7,
-      }
-    });
-  } catch (error) {
-    console.error("Failed to initialize Google Gen AI:", error);
-  }
-}
+const villaContext = villas.map(v => `
+  Name: ${v.name}
+  Location: ${v.location}
+  Capacity: ${v.capacity.min}-${v.capacity.max} pax
+  Day Stay (Weekday: ${v.rates.dayStay.weekday}, Weekend: ${v.rates.dayStay.weekend})
+  Night Stay (Weekday: ${v.rates.nightStay.weekday}, Weekend: ${v.rates.nightStay.weekend})
+  Overnight (Weekday: ${v.rates.overnight.weekday}, Weekend: ${v.rates.overnight.weekend})
+  Amenities: ${v.amenities.outdoor.join(', ')}
+`).join('\n\n');
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,6 +31,7 @@ export function Chatbot() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { blockedDates } = useAvailability();
 
   useEffect(() => {
     if (isOpen) {
@@ -68,7 +47,7 @@ export function Chatbot() {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     
-    if (!chatSession) {
+    if (!apiKey || apiKey === 'your_api_key_here') {
       setTimeout(() => {
         setMessages(prev => [...prev, { 
           role: 'system', 
@@ -81,7 +60,37 @@ export function Chatbot() {
     setIsLoading(true);
 
     try {
-      const response = await chatSession.sendMessage({ message: userMsg });
+      const aiClient = new GoogleGenAI({ apiKey });
+      
+      const booked = Array.from(blockedDates).join(', ');
+      const sysInstruction = `You are the exclusive concierge and virtual assistant for Yuhrum Villas. 
+Adopt a sophisticated, polite, and premium tone. Provide well-structured, easy-to-read answers. 
+Do not use markdown formatting like asterisks (**). Use spacing and new lines for a clean layout.
+Here is the villa information:\n${villaContext}
+
+CRITICAL AVAILABILITY INFO:
+Today's date is ${new Date().toISOString().split('T')[0]}.
+The following dates (YYYY-MM-DD) are CURRENTLY BOOKED AND UNAVAILABLE: ${booked || 'None'}.
+Any date NOT in this list is available. Use this information to accurately answer availability questions.`;
+
+      const geminiHistory = messages
+        .filter(m => m.role !== 'system')
+        .map(m => ({
+          role: m.role,
+          parts: [{ text: m.text }]
+        }));
+        
+      geminiHistory.push({ role: 'user', parts: [{ text: userMsg }] });
+
+      const response = await aiClient.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: geminiHistory,
+        config: {
+          systemInstruction: sysInstruction,
+          temperature: 0.7,
+        }
+      });
+      
       setMessages(prev => [...prev, { role: 'model', text: response.text }]);
     } catch (error) {
       console.error(error);
