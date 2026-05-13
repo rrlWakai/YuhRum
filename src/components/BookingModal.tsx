@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, ChevronRight, ChevronLeft, Sun, Moon, Sunrise, 
   CreditCard, Smartphone, Check, Shield, User, Phone, 
-  Mail, CalendarHeart, Users, Loader2
+  Mail, CalendarHeart, Users, Loader2, Home
 } from 'lucide-react';
 import { villas } from '../data/villas';
 import { supabase } from '../lib/supabase';
@@ -65,6 +65,13 @@ export function BookingModal({ villaId, onClose }: Props) {
     // When modal opens, pre-fetch latest availability
     refetch();
   }, []);
+
+  useEffect(() => {
+    // Keep guests within selected villa capacity when changing villa.
+    if (form.guests > rate.capacity) {
+      update('guests', rate.capacity);
+    }
+  }, [form.selectedVillaId]);
 
   function canProceed() {
     if (step === 1) return form.date && !blockedDates.has(form.date) && form.guests >= 1;
@@ -260,7 +267,27 @@ export function BookingModal({ villaId, onClose }: Props) {
                     {step === 1 && (
                       <motion.div key="step1" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="space-y-8">
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">1. Choose Your Package</label>
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">1. Choose Villa</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-[#0A192F]/40">
+                              <Home className="size-5" />
+                            </div>
+                            <select
+                              value={form.selectedVillaId}
+                              onChange={(e) => update('selectedVillaId', e.target.value)}
+                              className="w-full appearance-none rounded-xl border-2 border-gray-100 bg-white pl-14 pr-5 py-4 text-sm font-medium text-[#0A192F] outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                            >
+                              {villas.map((villa) => (
+                                <option key={villa.id} value={villa.id}>
+                                  {villa.name} (up to {villa.capacity.max} guests)
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">2. Choose Your Package</label>
                           <div className="grid grid-cols-3 gap-3">
                             {(Object.keys(STAY_LABELS) as StayType[]).map((type) => {
                               const { label, sub, Icon } = STAY_LABELS[type];
@@ -282,7 +309,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">2. Select Date</label>
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">3. Select Date</label>
                           {/* We use our premium Availability Calendar */}
                           <div className="bg-[#F7F6F4] p-1 rounded-2xl border border-gray-100">
                             <AvailabilityCalendar 
@@ -299,7 +326,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">3. Guest Count</label>
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">4. Guest Count</label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-[#0A192F]/40">
                               <Users className="size-5" />

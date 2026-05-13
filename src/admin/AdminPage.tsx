@@ -405,7 +405,7 @@ export function AdminPage() {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-block border px-2 py-1 text-[10px] uppercase tracking-[0.1em] font-semibold ${
+                          className={`inline-block border px-2 py-1 text-[10px] uppercase tracking-0.1em font-semibold ${
                             b.status === "confirmed"
                               ? "border-green-200 bg-green-50 text-green-700"
                               : b.status === "cancelled"
@@ -455,9 +455,9 @@ export function AdminPage() {
                 .map((b) => (
                   <div
                     key={b.id}
-                    className="border-l-4 border-[#0A192F] bg-white border-y border-r border-gray-200 p-5 shadow-sm"
+                    className="border-l-4 border-#0A192F bg-white border-y border-r border-gray-200 p-5 shadow-sm"
                   >
-                    <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-[#0A192F]">
+                    <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-0.1em text-[#0A192F]">
                       <Calendar className="size-4" /> {b.check_in} —{" "}
                       {b.check_out}
                     </div>
@@ -525,7 +525,7 @@ export function AdminPage() {
                             alert("Failed to update status.");
                           }
                         }}
-                        className={`border px-3 py-1.5 text-[10px] uppercase tracking-[0.1em] font-semibold outline-none ${
+                        className={`border px-3 py-1.5 text-[10px] uppercase tracking-0.1em font-semibold outline-none ${
                           b.status === "confirmed"
                             ? "border-green-300 bg-green-50 text-green-700 focus:border-green-500"
                             : b.status === "cancelled"
@@ -659,7 +659,7 @@ export function AdminPage() {
                             items.map((i) => (i.id === d.id ? updated : i)),
                           );
                         }}
-                        className={`border px-3 py-1 text-[10px] uppercase tracking-[0.1em] font-semibold transition-colors ${
+                        className={`border px-3 py-1 text-[10px] uppercase tracking-0.1em font-semibold transition-colors ${
                           d.is_active
                             ? "border-green-300 bg-green-50 text-green-700"
                             : "border-gray-300 bg-gray-50 text-gray-500"
@@ -821,7 +821,7 @@ export function AdminPage() {
                           setRoomForm({ ...room });
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        className="flex items-center gap-2 border border-gray-200 bg-[#F7F6F4] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0A192F] hover:border-[#0A192F] transition-colors"
+                        className="flex items-center gap-2 border border-gray-200 bg-[#F7F6F4] px-4 py-2 text-[10px] font-semibold uppercase tracking-0.1em text-[#0A192F] hover:border-[#0A192F] transition-colors"
                       >
                         <Edit2 className="size-3" /> Edit
                       </button>
@@ -832,7 +832,7 @@ export function AdminPage() {
                             setRooms((i) => i.filter((r) => r.id !== room.id));
                           }
                         }}
-                        className="flex items-center gap-2 border border-red-200 bg-red-50 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-700 hover:border-red-300 transition-colors"
+                        className="flex items-center gap-2 border border-red-200 bg-red-50 px-4 py-2 text-[10px] font-semibold uppercase tracking-0.1em text-red-700 hover:border-red-300 transition-colors"
                       >
                         <Trash2 className="size-3" /> Delete
                       </button>
@@ -921,7 +921,7 @@ export function AdminPage() {
                         });
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="flex items-center gap-2 border border-gray-200 bg-[#F7F6F4] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0A192F] hover:border-[#0A192F] transition-colors"
+                      className="flex items-center gap-2 border border-gray-200 bg-[#F7F6F4] px-4 py-2 text-[10px] font-semibold uppercase tracking-0.1em text-[#0A192F] hover:border-[#0A192F] transition-colors"
                     >
                       <Edit2 className="size-3" /> Edit
                     </button>
@@ -934,7 +934,7 @@ export function AdminPage() {
                           );
                         }
                       }}
-                      className="flex items-center gap-2 border border-red-200 bg-red-50 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-700 hover:border-red-300 transition-colors"
+                      className="flex items-center gap-2 border border-red-200 bg-red-50 px-4 py-2 text-[10px] font-semibold uppercase tracking-0.1em text-red-700 hover:border-red-300 transition-colors"
                     >
                       <Trash2 className="size-3" /> Delete
                     </button>

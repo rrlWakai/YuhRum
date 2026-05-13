@@ -1,5 +1,5 @@
-import { useRef, type ReactNode } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef, type ReactNode } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 type ParallaxSectionProps = {
   id?: string;
@@ -14,12 +14,12 @@ export function ParallaxSection({
   image,
   imageAlt,
   children,
-  className = '',
+  className = "",
 }: ParallaxSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start end', 'end start'],
+    offset: ["start end", "end start"],
   });
 
   // Layer 1 — photo: drifts slowly upward + zooms out as section enters viewport
@@ -28,7 +28,11 @@ export function ParallaxSection({
 
   // Layer 2 — gradient overlay: drifts at a faster rate creating depth separation
   const gradY = useTransform(scrollYProgress, [0, 1], [-35, 65]);
-  const gradOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.35, 0.6, 0.6, 0.35]);
+  const gradOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.8, 1],
+    [0.35, 0.6, 0.6, 0.35],
+  );
 
   return (
     <section
@@ -43,13 +47,17 @@ export function ParallaxSection({
           style={{ y: bgY, scale: bgScale }}
           className="absolute inset-0 will-change-transform"
         >
-          <img src={image} alt={imageAlt} className="h-full w-full object-cover" />
+          <img
+            src={image}
+            alt={imageAlt}
+            className="h-full w-full object-cover"
+          />
         </motion.div>
 
         {/* Layer 2: atmospheric gradient — faster drift for parallax depth */}
         <motion.div
           style={{ y: gradY, opacity: gradOpacity }}
-          className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-black/55 will-change-transform"
+          className="absolute inset-0 bg-linear-to-b from-black/50 via-black/10 to-black/55 will-change-transform"
         />
       </div>
 
