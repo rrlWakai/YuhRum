@@ -1,31 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Loader2 } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
 import yuhrumLogo from '../assets/yuhrumlogo.png';
-import { villas } from '../data/villas';
 import { useAvailability } from '../lib/hooks';
+import type { ChatMessage, ChatRequestPayload, ChatResponsePayload } from '@/types/chat';
+import { sendChatMessage } from '@/services/chat';
 
-type Message = {
-  role: 'user' | 'model' | 'system';
-  text: string;
-};
-
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
-const villaContext = villas.map(v => `
-  Name: ${v.name}
-  Location: ${v.location}
-  Capacity: ${v.capacity.min}-${v.capacity.max} pax
-  Day Stay (Weekday: ${v.rates.dayStay.weekday}, Weekend: ${v.rates.dayStay.weekend})
-  Night Stay (Weekday: ${v.rates.nightStay.weekday}, Weekend: ${v.rates.nightStay.weekend})
-  Overnight (Weekday: ${v.rates.overnight.weekday}, Weekend: ${v.rates.overnight.weekend})
-  Amenities: ${v.amenities.outdoor.join(', ')}
-`).join('\n\n');
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     { role: 'model', text: 'Welcome to Yuhrum Villas. How may I assist you with your reservation today?' }
   ]);
   const [input, setInput] = useState('');
@@ -46,54 +30,19 @@ export function Chatbot() {
     const userMsg = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    
-    if (!apiKey || apiKey === 'your_api_key_here') {
-      setTimeout(() => {
-        setMessages(prev => [...prev, { 
-          role: 'system', 
-          text: 'Error: Gemini API Key is not configured. Please add VITE_GEMINI_API_KEY to your .env file.' 
-        }]);
-      }, 500);
-      return;
-    }
 
     setIsLoading(true);
 
     try {
-      const aiClient = new GoogleGenAI({ apiKey });
-      
-      const booked = Array.from(blockedDates).join(', ');
-      const sysInstruction = `You are the exclusive concierge and virtual assistant for Yuhrum Villas. 
-Adopt a sophisticated, polite, and premium tone. Provide well-structured, easy-to-read answers. 
-Do not use markdown formatting like asterisks (**). Use spacing and new lines for a clean layout.
-Here is the villa information:\n${villaContext}
+      const payload: ChatRequestPayload = {
+        messages: messages.filter((m) => m.role !== 'system'),
+        userMessage: userMsg,
+        blockedDates: Array.from(blockedDates),
+      };
 
-CRITICAL AVAILABILITY INFO:
-Today's date is ${new Date().toISOString().split('T')[0]}.
-The following dates (YYYY-MM-DD) are CURRENTLY BOOKED AND UNAVAILABLE: ${booked || 'None'}.
-Any date NOT in this list is available. Use this information to accurately answer availability questions.`;
-
-      const geminiHistory = messages
-        .filter(m => m.role !== 'system')
-        .map(m => ({
-          role: m.role,
-          parts: [{ text: m.text }]
-        }));
-        
-      geminiHistory.push({ role: 'user', parts: [{ text: userMsg }] });
-
-      const response = await aiClient.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: geminiHistory,
-        config: {
-          systemInstruction: sysInstruction,
-          temperature: 0.7,
-        }
-      });
-      
-      setMessages(prev => [...prev, { role: 'model', text: response.text || 'I apologize, but I received an empty response. Please try again.' }]);
+      const data = await sendChatMessage(payload) as ChatResponsePayload;
+      setMessages(prev => [...prev, { role: 'model', text: data.reply || 'I apologize, but I received an empty response. Please try again.' }]);
     } catch (error) {
-      console.error(error);
       setMessages(prev => [...prev, { role: 'system', text: 'I apologize, but I am currently unavailable to respond. Please try again later.' }]);
     } finally {
       setIsLoading(false);

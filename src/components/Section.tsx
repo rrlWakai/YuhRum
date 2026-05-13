@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 
 type SectionProps = {
   id?: string;
@@ -7,7 +7,7 @@ type SectionProps = {
   children: ReactNode;
 };
 
-export function Section({ id, className = '', children }: SectionProps) {
+export function Section({ id, className = "", children }: SectionProps) {
   return (
     <motion.section
       id={id}
@@ -32,9 +32,7 @@ export function Section({ id, className = '', children }: SectionProps) {
       `}
     >
       {/* Inner wrapper prevents content from breaking layout */}
-      <div className="w-full max-w-[1440px] mx-auto">
-        {children}
-      </div>
+      <div className="w-full max-w-1440px mx-auto">{children}</div>
     </motion.section>
   );
 }
