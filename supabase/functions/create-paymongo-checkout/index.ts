@@ -1,139 +1,206 @@
-// @ts-ignore - Deno imports are not recognized by standard TypeScript
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+// deno-lint-ignore-file no-explicit-any
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
-// @ts-ignore - Deno is a global in the Edge Function environment
-declare const Deno: any;
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+type CheckoutRequest = {
+  amount: number;
+  description: string;
+  name: string;
+  email: string;
+  phone?: string;
+  referenceNumber: string;
 };
 
-serve(async (req: Request) => {
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+type ErrorBody = {
+  error: {
+    code: string;
+    message: string;
+  };
+};
+
+const DEFAULT_ALLOWED_ORIGINS = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+];
+
+function jsonResponse(body: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      ...extraHeaders,
+    },
+  });
+}
+
+function errorResponse(code: string, message: string, status = 400, extraHeaders: Record<string, string> = {}) {
+  const body: ErrorBody = {
+    error: { code, message },
+  };
+  return jsonResponse(body, status, extraHeaders);
+}
+
+function getAllowedOrigins(): string[] {
+  const configured = Deno.env.get("ALLOWED_ORIGINS");
+  if (!configured) return DEFAULT_ALLOWED_ORIGINS;
+  return configured
+    .split(",")
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigins = getAllowedOrigins();
+  const allowOrigin = origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
+}
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isCheckoutRequest(input: unknown): input is CheckoutRequest {
+  if (!input || typeof input !== "object") return false;
+  const v = input as Record<string, unknown>;
+  return (
+    typeof v.amount === "number" &&
+    typeof v.description === "string" &&
+    typeof v.name === "string" &&
+    typeof v.email === "string" &&
+    typeof v.referenceNumber === "string" &&
+    (typeof v.phone === "string" || typeof v.phone === "undefined")
+  );
+}
+
+function validatePayload(payload: CheckoutRequest): string | null {
+  if (!Number.isFinite(payload.amount) || payload.amount <= 0) return "Invalid amount.";
+  if (payload.amount > 500000) return "Amount exceeds maximum allowed limit.";
+  if (!payload.name.trim()) return "Customer name is required.";
+  if (!isValidEmail(payload.email)) return "Valid email is required.";
+  if (!payload.referenceNumber.trim()) return "Reference number is required.";
+  if (!payload.description.trim()) return "Description is required.";
+  return null;
+}
+
+serve(async (req) => {
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
+  if (req.method !== "POST") {
+    return errorResponse("METHOD_NOT_ALLOWED", "Only POST is allowed.", 405, corsHeaders);
+  }
+
+  const paymongoSecret = Deno.env.get("PAYMONGO_SECRET_KEY");
+  const siteUrl = Deno.env.get("SITE_URL");
+  if (!paymongoSecret) {
+    return errorResponse("SERVER_CONFIG_ERROR", "Payment service is unavailable.", 500, corsHeaders);
+  }
+  if (!siteUrl) {
+    return errorResponse("SERVER_CONFIG_ERROR", "Missing SITE_URL configuration.", 500, corsHeaders);
+  }
+
+  let parsed: unknown;
   try {
-    const body = await req.json();
+    parsed = await req.json();
+  } catch {
+    return errorResponse("INVALID_JSON", "Malformed JSON payload.", 400, corsHeaders);
+  }
 
-    const {
-      amount,
-      description,
-      name,
-      email,
-      phone,
-      referenceNumber,
-    } = body;
+  if (!isCheckoutRequest(parsed)) {
+    return errorResponse("INVALID_PAYLOAD", "Request payload is invalid.", 400, corsHeaders);
+  }
 
-    // ✅ Input validation
-    if (!amount || amount <= 0) {
-      throw new Error('Invalid amount');
-    }
+  const validationError = validatePayload(parsed);
+  if (validationError) {
+    return errorResponse("VALIDATION_ERROR", validationError, 400, corsHeaders);
+  }
 
-    if (!name || !email) {
-      throw new Error('Missing customer information');
-    }
-
-    if (!referenceNumber) {
-      throw new Error('Missing reference number');
-    }
-
-    const PAYMONGO_SECRET_KEY = Deno.env.get('PAYMONGO_SECRET_KEY');
-
-    if (!PAYMONGO_SECRET_KEY) {
-      throw new Error('PAYMONGO_SECRET_KEY is not set');
-    }
-
-    // ✅ Safe origin fallback
-    const origin =
-      req.headers.get('origin') ||
-      'https://yuh-rum.vercel.app/'; // replace with your actual domain
-
-    console.log('Creating checkout session:', {
-      amount,
-      email,
-      referenceNumber,
-    });
-
-    const payload = {
-      data: {
-        attributes: {
-          line_items: [
-            {
-              amount: Math.round(amount * 100), // centavos
-              currency: 'PHP',
-              name: description || 'Booking Payment',
-              quantity: 1,
-            },
-          ],
-          payment_method_types: ['gcash', 'paymaya', 'card'],
-          reference_number: referenceNumber,
-          success_url: `${origin}/?payment=success&ref=${referenceNumber}`,
-          cancel_url: `${origin}/?payment=cancelled`,
-          billing: {
-            name,
-            email,
-            phone,
+  const amountInCentavos = Math.round(parsed.amount * 100);
+  const encodedKey = btoa(`${paymongoSecret}:`);
+  const requestPayload = {
+    data: {
+      attributes: {
+        line_items: [
+          {
+            amount: amountInCentavos,
+            currency: "PHP",
+            name: parsed.description,
+            quantity: 1,
           },
+        ],
+        payment_method_types: ["gcash", "paymaya", "card"],
+        reference_number: parsed.referenceNumber,
+        success_url: `${siteUrl}/?payment=success&ref=${encodeURIComponent(parsed.referenceNumber)}`,
+        cancel_url: `${siteUrl}/?payment=cancelled`,
+        billing: {
+          name: parsed.name,
+          email: parsed.email,
+          phone: parsed.phone ?? "",
         },
       },
-    };
+    },
+  };
 
-    // ✅ Encode secret key
-    const encodedKey = btoa(`${PAYMONGO_SECRET_KEY}:`);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
 
-    const response = await fetch(
-      'https://api.paymongo.com/v1/checkout_sessions',
-      {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'content-type': 'application/json',
-          authorization: `Basic ${encodedKey}`,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+  try {
+    const paymongoResponse = await fetch("https://api.paymongo.com/v1/checkout_sessions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "authorization": `Basic ${encodedKey}`,
+      },
+      body: JSON.stringify(requestPayload),
+    });
 
-    const data = await response.json();
+    const responseText = await paymongoResponse.text();
+    let responseData: any = null;
+    try {
+      responseData = responseText ? JSON.parse(responseText) : null;
+    } catch {
+      responseData = null;
+    }
 
-    // ✅ Better error handling
-    if (!response.ok) {
-      console.error('PayMongo error:', data);
-      throw new Error(
-        data?.errors?.[0]?.detail || 'Failed to create checkout session'
+    if (!paymongoResponse.ok) {
+      console.error("PayMongo checkout session error", {
+        status: paymongoResponse.status,
+        details: responseData?.errors?.[0]?.detail ?? "No detail returned",
+        code: responseData?.errors?.[0]?.code ?? "UNKNOWN",
+      });
+      return errorResponse(
+        "PAYMENT_PROVIDER_ERROR",
+        "Unable to create payment session. Please verify payment details and try again.",
+        502,
+        corsHeaders,
       );
     }
 
-    return new Response(
-      JSON.stringify({
-        checkoutUrl: data.data.attributes.checkout_url,
-      }),
-      {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-        },
-        status: 200,
-      }
-    );
-  } catch (error: any) {
-    console.error('Function error:', error);
+    const checkoutUrl = responseData?.data?.attributes?.checkout_url;
+    if (!checkoutUrl || typeof checkoutUrl !== "string") {
+      console.error("PayMongo returned success without checkout URL");
+      return errorResponse("INVALID_PROVIDER_RESPONSE", "Payment session was incomplete.", 502, corsHeaders);
+    }
 
-    return new Response(
-      JSON.stringify({
-        error: error.message || 'Something went wrong',
-      }),
-      {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-        },
-        status: 400,
-      }
-    );
+    return jsonResponse({ checkoutUrl }, 200, corsHeaders);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      return errorResponse("PAYMENT_TIMEOUT", "Payment service timed out. Please try again.", 504, corsHeaders);
+    }
+    console.error("Unexpected checkout error", { message: error instanceof Error ? error.message : String(error) });
+    return errorResponse("PAYMENT_REQUEST_FAILED", "Unable to process payment request.", 500, corsHeaders);
+  } finally {
+    clearTimeout(timeout);
   }
 });

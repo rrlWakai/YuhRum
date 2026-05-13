@@ -23,6 +23,7 @@ import { villas } from "../data/villas";
 import { supabase } from "../lib/supabase";
 import { AvailabilityCalendar } from "./AvailabilityCalendar";
 import { isWeekend, useAvailability } from "../lib/hooks";
+import { toUserFacingError } from "../lib/api-errors";
 
 type Props = {
   villaId: string | null;
@@ -63,6 +64,7 @@ export function BookingModal({ villaId, onClose }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [toastMsg, setToastMsg] = useState("");
 
   const { blockedDates, refetch } = useAvailability();
 
@@ -121,6 +123,7 @@ export function BookingModal({ villaId, onClose }: Props) {
   async function handleCompleteBooking() {
     setIsSubmitting(true);
     setErrorMsg("");
+    setToastMsg("");
 
     try {
       // Final availability check before inserting
@@ -170,7 +173,10 @@ export function BookingModal({ villaId, onClose }: Props) {
         });
 
       if (edgeError) throw edgeError;
-      if (edgeData?.error) throw new Error(edgeData.error);
+      if (edgeData?.error) {
+        const providerMessage = typeof edgeData.error === "string" ? edgeData.error : edgeData.error?.message;
+        throw new Error(providerMessage || "Unable to create checkout session.");
+      }
 
       if (edgeData?.checkoutUrl) {
         window.location.href = edgeData.checkoutUrl;
@@ -179,7 +185,9 @@ export function BookingModal({ villaId, onClose }: Props) {
 
       setIsSuccess(true);
     } catch (err: any) {
-      setErrorMsg(err.message);
+      const parsed = toUserFacingError(err);
+      setErrorMsg(parsed.message);
+      setToastMsg(parsed.retryable ? "Payment session failed. Please retry." : "Please update the form and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -306,6 +314,13 @@ export function BookingModal({ villaId, onClose }: Props) {
             <>
               {/* LEFT SIDE: Form Steps */}
               <div className="flex-1 flex flex-col h-full bg-white relative overflow-hidden">
+                {toastMsg && (
+                  <div className="absolute top-4 left-4 right-4 z-30">
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-700 shadow-sm">
+                      {toastMsg}
+                    </div>
+                  </div>
+                )}
                 {/* Mobile Header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white z-10 md:px-10 md:py-6 md:border-none">
                   <div>
