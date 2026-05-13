@@ -18,12 +18,20 @@ export async function getProfileRole(userId: string): Promise<UserRole | null> {
   if (error) {
     const message = String(error.message || '');
     const code = (error as { code?: string }).code;
+    const details = String((error as { details?: string }).details || '');
     const tableMissing =
       code === 'PGRST205' ||
       message.toLowerCase().includes('profiles') &&
       (message.toLowerCase().includes('not found') || message.toLowerCase().includes('does not exist'));
+    const rlsRecursion =
+      message.toLowerCase().includes('infinite recursion') ||
+      details.toLowerCase().includes('infinite recursion');
 
     if (tableMissing) {
+      return null;
+    }
+    if (rlsRecursion) {
+      // Keep app usable while DB policies are being corrected.
       return null;
     }
 

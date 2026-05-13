@@ -135,9 +135,8 @@ export function BookingModal({ villaId, onClose }: Props) {
       }
 
       const d = new Date(form.date);
-      if (form.stayType === "overnight") {
-        d.setDate(d.getDate() + 1);
-      }
+      // DB enforces check_out > check_in; date-only stays still need next-day checkout date.
+      d.setDate(d.getDate() + 1);
       const checkOutDate = d.toISOString().split("T")[0];
 
       const { data: bookingData, error } = await supabase
@@ -147,6 +146,7 @@ export function BookingModal({ villaId, onClose }: Props) {
             guest_name: form.name,
             email: form.email,
             phone: form.contact,
+            villa_id: form.selectedVillaId,
             check_in: form.date,
             check_out: checkOutDate,
             guests: form.guests,
