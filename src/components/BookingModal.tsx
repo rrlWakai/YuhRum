@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { villas } from "../data/villas";
 import { supabase } from "../lib/supabase";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { AvailabilityCalendar } from "./AvailabilityCalendar";
 import { isWeekend, useAvailability } from "../lib/hooks";
 import { toUserFacingError } from "../lib/api-errors";
@@ -102,6 +103,10 @@ export function BookingModal({ villaId, onClose }: Props) {
     return true;
   }
 
+  function isValidEmail(email: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
   async function handleNext() {
     setErrorMsg("");
     if (step === 1) {
@@ -132,6 +137,12 @@ export function BookingModal({ villaId, onClose }: Props) {
         throw new Error(
           "This date is no longer available. Please select another date.",
         );
+      }
+      if (!isValidEmail(form.email)) {
+        throw new Error("Please enter a valid email address.");
+      }
+      if (!Number.isFinite(total) || total <= 0) {
+        throw new Error("Invalid booking total. Please review your booking details.");
       }
 
       const d = new Date(form.date);
@@ -172,7 +183,21 @@ export function BookingModal({ villaId, onClose }: Props) {
           },
         });
 
-      if (edgeError) throw edgeError;
+      if (edgeError) {
+        if (edgeError instanceof FunctionsHttpError) {
+          try {
+            const body = await edgeError.context.json();
+            const message =
+              body?.error?.message ||
+              body?.message ||
+              "Unable to create checkout session.";
+            throw new Error(message);
+          } catch {
+            throw new Error("Unable to create checkout session.");
+          }
+        }
+        throw edgeError;
+      }
       if (edgeData?.error) {
         const providerMessage = typeof edgeData.error === "string" ? edgeData.error : edgeData.error?.message;
         throw new Error(providerMessage || "Unable to create checkout session.");
