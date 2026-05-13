@@ -1,5 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
+// @ts-ignore - Deno URL imports are resolved by the Supabase Edge runtime
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+// @ts-ignore - Deno global exists in Supabase Edge runtime
+declare const Deno: { env: { get: (key: string) => string | undefined } };
 
 type CheckoutRequest = {
   amount: number;
@@ -44,7 +47,7 @@ function getAllowedOrigins(): string[] {
   if (!configured) return DEFAULT_ALLOWED_ORIGINS;
   return configured
     .split(",")
-    .map((v) => v.trim())
+    .map((v: string) => v.trim())
     .filter(Boolean);
 }
 
@@ -87,7 +90,7 @@ function validatePayload(payload: CheckoutRequest): string | null {
   return null;
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
 
