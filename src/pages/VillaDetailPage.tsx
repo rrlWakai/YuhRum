@@ -321,9 +321,12 @@ export function VillaDetailPage({ villaId, onNavigate, onReserve }: Props) {
           </Reveal>
           <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_340px]">
             <div className="overflow-hidden border border-blush/15">
-              <iframe title="Villa Location"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=115.098%2C-8.876%2C115.296%2C-8.69&layer=mapnik"
-                className="h-[400px] w-full border-0 md:h-[480px]" loading="lazy" />
+              <iframe
+                title="Villa Location"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(villa.location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                className="h-[400px] w-full border-0 md:h-[480px]"
+                loading="lazy"
+              />
             </div>
             <div className="space-y-4">
               <div className="border border-blush/15 bg-petal p-7 space-y-3">
