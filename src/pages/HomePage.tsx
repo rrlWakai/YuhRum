@@ -228,7 +228,7 @@ export function HomePage({ onNavigate, onReserve }: Props) {
               style={{ y: aboutImageY }}
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
-              className="relative h-64 overflow-hidden border border-gray-200 sm:h-80 md:h-420px lg:h-560px"
+              className="relative aspect-square overflow-hidden border border-gray-200 sm:aspect-[4/5] md:h-[500px] lg:h-[650px]"
             >
               <img
                 src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1400&q=80"
@@ -287,8 +287,8 @@ export function HomePage({ onNavigate, onReserve }: Props) {
         imageAlt="Private villa exterior"
         className="border-y border-gray-200"
       >
-        <div className="mx-auto max-w-1240px px-6 md:px-10">
-          <Reveal delay={0.05} className="max-w-3xl">
+        <div className="mx-auto max-w-1240px px-6 md:px-10 text-center sm:text-left">
+          <Reveal delay={0.05} className="max-w-3xl mx-auto sm:mx-0">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/90">
               Our Properties
             </p>
@@ -301,7 +301,7 @@ export function HomePage({ onNavigate, onReserve }: Props) {
             </p>
           </Reveal>
         </div>
-        <div className="mt-14">
+        <div className="mt-12 sm:mt-20">
           <RoomCarousel
             rooms={villaCards}
             onSelect={(i) =>

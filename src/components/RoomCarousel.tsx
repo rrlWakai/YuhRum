@@ -65,26 +65,26 @@ export function RoomCarousel({ rooms, onSelect }: RoomCarouselProps) {
               ease: [0.22, 1, 0.36, 1],
             }}
             animate={{ scale: activeIndex === index ? 1.03 : 0.96 }}
-            className="group relative min-w-[82%] snap-center overflow-hidden border border-gray-200 bg-white md:min-w-[58%] xl:min-w-[42%]"
+            className="group relative min-w-[85%] snap-center overflow-hidden border border-gray-200 bg-white sm:min-w-[70%] md:min-w-[58%] xl:min-w-[42%]"
           >
-            <div className="relative h-360px sm:h-440px md:h-540px overflow-hidden">
+            <div className="relative w-full aspect-[3/4] overflow-hidden sm:aspect-[4/5] md:aspect-[3/4] lg:h-[700px]">
               <motion.img
                 src={room.image}
                 alt={room.name}
                 className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-8 text-white">
+              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8 md:p-12">
                 <Reveal delay={0.05}>
                   <p className="text-[10px] uppercase tracking-[0.24em] text-white/80">
                     {room.category}
                   </p>
                 </Reveal>
                 <Reveal delay={0.12}>
-                  <h3 className="mt-3 font-serif text-4xl">{room.name}</h3>
+                  <h3 className="mt-2 font-serif text-2xl sm:text-3xl md:text-4xl">{room.name}</h3>
                 </Reveal>
                 <Reveal delay={0.28}>
-                  <div className="mt-5 grid grid-cols-2 gap-3 text-xs text-white/90">
+                  <div className="mt-4 grid grid-cols-1 gap-y-2 gap-x-4 text-[10px] text-white/90 min-[400px]:grid-cols-2 sm:text-xs">
                     {roomFeatures[index].map((feature) => (
                       <div
                         key={`${room.name}-${feature.label}`}
