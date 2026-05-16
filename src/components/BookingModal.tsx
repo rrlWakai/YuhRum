@@ -338,7 +338,7 @@ export function BookingModal({ villaId, onClose }: Props) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 lg:p-10"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6 lg:p-10"
       >
         <div
           className="absolute inset-0 bg-plum/60 backdrop-blur-md"

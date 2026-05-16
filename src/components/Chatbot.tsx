@@ -60,7 +60,7 @@ export function Chatbot() {
         onClick={() => setIsOpen(true)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className={`fixed bottom-6 right-6 z-50 flex size-14 items-center justify-center border border-gray-200 bg-white shadow-lg transition-opacity duration-300 ${
+        className={`fixed bottom-24 md:bottom-6 right-6 z-40 flex size-14 items-center justify-center border border-gray-200 bg-white shadow-lg transition-opacity duration-300 ${
           isOpen ? 'pointer-events-none opacity-0' : 'opacity-100'
         }`}
       >
@@ -75,7 +75,7 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-6 right-6 z-50 flex h-[550px] max-h-[80vh] w-[380px] max-w-[calc(100vw-48px)] flex-col border border-gray-200 bg-white shadow-2xl"
+            className="fixed bottom-24 md:bottom-6 right-6 z-40 flex h-[550px] max-h-[80vh] w-[380px] max-w-[calc(100vw-48px)] flex-col border border-gray-200 bg-white shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-200 bg-[#0A192F] px-5 py-4">
