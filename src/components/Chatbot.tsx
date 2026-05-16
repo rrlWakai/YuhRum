@@ -34,10 +34,14 @@ export function Chatbot() {
     setIsLoading(true);
 
     try {
+      const formattedBlockedDates = Array.from(blockedDates.entries()).map(
+        ([date, types]) => `${date} (${Array.from(types).join(', ')})`
+      );
+
       const payload: ChatRequestPayload = {
         messages: messages.filter((m) => m.role !== 'system'),
         userMessage: userMsg,
-        blockedDates: Array.from(blockedDates),
+        blockedDates: formattedBlockedDates,
       };
 
       const data = await sendChatMessage(payload) as ChatResponsePayload;
