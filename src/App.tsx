@@ -1,7 +1,8 @@
 import { lazy, Suspense, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Header } from '@/components/Header';
+import { SakuraNav } from '@/components/SakuraNav';
 import { BookingModal } from '@/components/BookingModal';
+import { CustomCursor } from '@/components/CustomCursor';
 import { villas } from '@/data/villas';
 import { AuthProvider } from '@/hooks/useAuth';
 import { AdminRoute } from '@/routes/AdminRoute';
@@ -26,7 +27,7 @@ function AppContent() {
 
   if (window.location.pathname.startsWith('/admin')) {
     return (
-      <Suspense fallback={<div className="min-h-screen bg-[#F7F6F4]" />}>
+      <Suspense fallback={<div className="min-h-screen bg-bg" />}>
         <AdminRoute unauthenticated={<AdminLoginForm />}>
           <AdminPage />
         </AdminRoute>
@@ -55,11 +56,14 @@ function AppContent() {
   return (
     <>
       {isLoading && (
-        <Suspense fallback={<div className="min-h-screen bg-[#F7F6F4]" />}>
+        <Suspense fallback={<div className="min-h-screen bg-bg" />}>
           <Loader onComplete={() => setIsLoading(false)} />
         </Suspense>
       )}
-      <Header
+
+      <CustomCursor />
+
+      <SakuraNav
         page={page}
         onNavigate={navigate}
         onReserve={openBooking}
@@ -69,7 +73,7 @@ function AppContent() {
       <AnimatePresence mode="wait">
         {page.type === 'home' && (
           <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-            <Suspense fallback={<div className="min-h-screen bg-[#F7F6F4]" />}>
+            <Suspense fallback={<div className="min-h-screen bg-bg" />}>
               <HomePage onNavigate={navigate} onReserve={openBooking} />
             </Suspense>
           </motion.div>
@@ -77,7 +81,7 @@ function AppContent() {
 
         {page.type === 'detail' && (
           <motion.div key="detail" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-            <Suspense fallback={<div className="min-h-screen bg-[#F7F6F4]" />}>
+            <Suspense fallback={<div className="min-h-screen bg-bg" />}>
               <VillaDetailPage
                 villaId={page.villaId}
                 onNavigate={navigate}
@@ -89,7 +93,7 @@ function AppContent() {
 
         {page.type === 'gallery' && (
           <motion.div key="gallery" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-            <Suspense fallback={<div className="min-h-screen bg-[#F7F6F4]" />}>
+            <Suspense fallback={<div className="min-h-screen bg-bg" />}>
               <GalleryPage villaId={page.villaId} onNavigate={navigate} />
             </Suspense>
           </motion.div>

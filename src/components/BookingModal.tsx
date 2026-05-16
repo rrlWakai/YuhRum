@@ -222,7 +222,7 @@ export function BookingModal({ villaId, onClose }: Props) {
   // --- Sticky Summary Component ---
   const SummaryContent = () => (
     <div className="flex flex-col h-full">
-      <h3 className="font-serif text-2xl text-[#0A192F] mb-6 hidden md:block">
+      <h3 className="font-display italic text-2xl text-petal mb-6 hidden md:block">
         Booking Summary
       </h3>
 
@@ -231,38 +231,38 @@ export function BookingModal({ villaId, onClose }: Props) {
           <img
             src={selectedVilla.coverImage}
             alt={selectedVilla.name}
-            className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+            className="w-24 h-24 object-cover  border border-blush/20"
           />
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-gray-500">
+            <p className="text-[10px] uppercase tracking-widest text-shadow/70">
               Private Villa
             </p>
-            <p className="font-serif text-lg text-[#0A192F]">
+            <p className="font-display italic text-lg text-petal">
               {selectedVilla.name}
             </p>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-shadow mt-1">
               {STAY_LABELS[form.stayType].label}
             </p>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-6 space-y-4 text-sm text-gray-700">
+        <div className="border-t border-blush/20 pt-6 space-y-4 text-sm text-petal/70">
           <div className="flex justify-between">
             <span>Date</span>
-            <span className="font-medium text-[#0A192F]">
+            <span className="font-medium text-petal">
               {form.date || "Not selected"}
             </span>
           </div>
           <div className="flex justify-between">
             <span>Guests</span>
-            <span className="font-medium text-[#0A192F]">
+            <span className="font-medium text-petal">
               {form.guests} pax
             </span>
           </div>
         </div>
 
         {form.date && (
-          <div className="border-t border-gray-200 pt-6 space-y-3 text-sm text-gray-700">
+          <div className="border-t border-blush/20 pt-6 space-y-3 text-sm text-petal/70">
             <div className="flex justify-between">
               <span>
                 {STAY_LABELS[form.stayType].label} (
@@ -271,7 +271,7 @@ export function BookingModal({ villaId, onClose }: Props) {
               <span>{formatPrice(basePrice)}</span>
             </div>
             {extraGuests > 0 && (
-              <div className="flex justify-between text-gray-500">
+              <div className="flex justify-between text-shadow/70">
                 <span>Extra guests ({extraGuests} × ₱500)</span>
                 <span>{formatPrice(extraFee)}</span>
               </div>
@@ -282,14 +282,14 @@ export function BookingModal({ villaId, onClose }: Props) {
 
       <div className="mt-6 border-t border-[#D1DEEA] pt-6">
         <div className="flex justify-between items-end mb-1">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-petal">
             Total Due
           </span>
-          <span className="font-serif text-3xl text-[#0A192F]">
+          <span className="font-display italic text-3xl text-petal">
             {formatPrice(total)}
           </span>
         </div>
-        <p className="text-xs text-gray-500 text-right">
+        <p className="text-xs text-shadow/70 text-right">
           Includes all taxes and fees
         </p>
       </div>
@@ -314,24 +314,24 @@ export function BookingModal({ villaId, onClose }: Props) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.98 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="relative z-10 w-full h-full md:h-[85vh] md:max-h-800px md:max-w-4xl lg:max-w-5xl bg-white md:rounded-2xl flex flex-col md:flex-row overflow-hidden shadow-2xl"
+          className="relative z-10 w-full h-full md:h-[85vh] md:max-h-800px md:max-w-4xl lg:max-w-5xl bg-petal md:flex flex-col md:flex-row overflow-hidden shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {isSuccess ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-10 text-center bg-white">
-              <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-[#EBF5EF] text-[#3D6B52] mb-8 ring-8 ring-[#EBF5EF]/50">
+            <div className="flex-1 flex flex-col items-center justify-center p-10 text-center bg-bg">
+              <div className="mx-auto flex size-20 items-center justify-center  bg-[#EBF5EF] text-[#3D6B52] mb-8 ring-8 ring-[#EBF5EF]/50">
                 <Check className="size-10" />
               </div>
-              <h2 className="font-serif text-4xl text-[#0A192F]">
+              <h2 className="font-display italic text-4xl text-petal">
                 Booking Request Sent
               </h2>
-              <p className="mt-4 max-w-sm text-gray-600 leading-relaxed">
+              <p className="mt-4 max-w-sm text-shadow leading-relaxed">
                 Your reservation request is confirmed. We've sent a detailed
                 email with your itinerary and payment instructions.
               </p>
               <button
                 onClick={onClose}
-                className="mt-10 btn-navy px-10 py-4 text-xs font-semibold uppercase tracking-[0.15em]"
+                className="mt-10 bg-blush font-body text-[10px] uppercase tracking-[0.2em] text-bg hover:bg-petal transition-all px-10 py-4 text-xs font-semibold uppercase tracking-[0.15em]"
               >
                 Return to Website
               </button>
@@ -339,27 +339,27 @@ export function BookingModal({ villaId, onClose }: Props) {
           ) : (
             <>
               {/* LEFT SIDE: Form Steps */}
-              <div className="flex-1 flex flex-col h-full bg-white relative overflow-hidden">
+              <div className="flex-1 flex flex-col h-full bg-bg relative overflow-hidden">
                 {toastMsg && (
                   <div className="absolute top-4 left-4 right-4 z-30">
-                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-700 shadow-sm">
+                    <div className=" border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-700 shadow-sm">
                       {toastMsg}
                     </div>
                   </div>
                 )}
                 {/* Mobile Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white z-10 md:px-10 md:py-6 md:border-none">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-blush/10 bg-bg z-10 md:px-10 md:py-6 md:border-none">
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0A192F]/60">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-petal/60">
                       Step {step} of {STEP_LABELS.length}
                     </p>
-                    <p className="font-serif text-2xl text-[#0A192F] mt-1">
+                    <p className="font-display italic text-2xl text-petal mt-1">
                       {STEP_LABELS[step - 1]}
                     </p>
                   </div>
                   <button
                     onClick={onClose}
-                    className="flex size-10 items-center justify-center rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors"
+                    className="flex size-10 items-center justify-center  bg-gray-50 text-shadow/70 hover:bg-gray-100 transition-colors"
                   >
                     <X className="size-5" />
                   </button>
@@ -370,7 +370,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                   {STEP_LABELS.map((_, i) => (
                     <div
                       key={i}
-                      className={`h-full flex-1 transition-colors duration-500 ${i + 1 <= step ? "bg-[#0A192F]" : "bg-transparent"}`}
+                      className={`h-full flex-1 transition-colors duration-500 ${i + 1 <= step ? "bg-blush" : "bg-transparent"}`}
                     />
                   ))}
                 </div>
@@ -387,11 +387,11 @@ export function BookingModal({ villaId, onClose }: Props) {
                         className="space-y-8"
                       >
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             1. Choose Villa
                           </label>
                           <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-[#0A192F]/40">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
                               <Home className="size-5" />
                             </div>
                             <select
@@ -399,7 +399,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                               onChange={(e) =>
                                 update("selectedVillaId", e.target.value)
                               }
-                              className="w-full appearance-none rounded-xl border-2 border-gray-100 bg-white pl-14 pr-5 py-4 text-sm font-medium text-[#0A192F] outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              className="w-full appearance-none  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
                             >
                               {villas.map((villa) => (
                                 <option key={villa.id} value={villa.id}>
@@ -412,7 +412,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             2. Choose Your Package
                           </label>
                           <div className="grid grid-cols-3 gap-3">
@@ -425,20 +425,20 @@ export function BookingModal({ villaId, onClose }: Props) {
                                     key={type}
                                     type="button"
                                     onClick={() => update("stayType", type)}
-                                    className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+                                    className={`flex flex-col items-center justify-center p-4  border-2 transition-all duration-200 ${
                                       active
-                                        ? "border-[#0A192F] bg-[#0A192F] text-white shadow-md"
-                                        : "border-gray-100 bg-white text-gray-500 hover:border-gray-200"
+                                        ? "border-[#0A192F] bg-blush text-bg shadow-md"
+                                        : "border-blush/10 bg-bg text-shadow/70 hover:border-blush/20"
                                     }`}
                                   >
                                     <Icon
-                                      className={`size-5 mb-2 ${active ? "text-white" : "text-[#0A192F]"}`}
+                                      className={`size-5 mb-2 ${active ? "text-bg" : "text-petal"}`}
                                     />
                                     <span className="text-xs font-bold uppercase tracking-wider">
                                       {label}
                                     </span>
                                     <span
-                                      className={`text-[9px] uppercase tracking-widest mt-1 ${active ? "text-white/70" : "text-gray-400"}`}
+                                      className={`text-[9px] uppercase tracking-widest mt-1 ${active ? "text-bg/70" : "text-shadow/50"}`}
                                     >
                                       {sub}
                                     </span>
@@ -450,13 +450,12 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             3. Select Date
                           </label>
                           {/* We use our premium Availability Calendar */}
-                          <div className="bg-[#F7F6F4] p-1 rounded-2xl border border-gray-100">
+                          <div className="bg-white p-1  border border-blush/10">
                             <AvailabilityCalendar
-                              mode="single"
                               stayType={form.stayType}
                               selectedDate={form.date}
                               onSelect={(d) => update("date", d)}
@@ -475,11 +474,11 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             4. Guest Count
                           </label>
                           <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-[#0A192F]/40">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
                               <Users className="size-5" />
                             </div>
                             <input
@@ -490,10 +489,10 @@ export function BookingModal({ villaId, onClose }: Props) {
                               onChange={(e) =>
                                 update("guests", Number(e.target.value))
                               }
-                              className="w-full rounded-xl border-2 border-gray-100 bg-white pl-14 pr-5 py-4 text-sm font-medium text-[#0A192F] outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
                             />
                           </div>
-                          <p className="mt-2 text-[10px] uppercase tracking-widest text-gray-500">
+                          <p className="mt-2 text-[10px] uppercase tracking-widest text-shadow/70">
                             Max {rate.capacity} guests. +₱500 per extra guest
                             after {selectedVilla.capacity.base}.
                           </p>
@@ -510,27 +509,27 @@ export function BookingModal({ villaId, onClose }: Props) {
                         className="space-y-6"
                       >
                         <div>
-                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             Full Name
                           </label>
                           <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-[#0A192F]/40">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
                               <User className="size-5" />
                             </div>
                             <input
                               value={form.name}
                               onChange={(e) => update("name", e.target.value)}
                               placeholder="Juan dela Cruz"
-                              className="w-full rounded-xl border-2 border-gray-100 bg-white pl-14 pr-5 py-4 text-sm font-medium text-[#0A192F] outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             Contact Number
                           </label>
                           <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-[#0A192F]/40">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
                               <Phone className="size-5" />
                             </div>
                             <input
@@ -539,16 +538,16 @@ export function BookingModal({ villaId, onClose }: Props) {
                                 update("contact", e.target.value)
                               }
                               placeholder="+63 912 345 6789"
-                              className="w-full rounded-xl border-2 border-gray-100 bg-white pl-14 pr-5 py-4 text-sm font-medium text-[#0A192F] outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             Email Address
                           </label>
                           <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-[#0A192F]/40">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
                               <Mail className="size-5" />
                             </div>
                             <input
@@ -556,16 +555,16 @@ export function BookingModal({ villaId, onClose }: Props) {
                               value={form.email}
                               onChange={(e) => update("email", e.target.value)}
                               placeholder="juan@email.com"
-                              className="w-full rounded-xl border-2 border-gray-100 bg-white pl-14 pr-5 py-4 text-sm font-medium text-[#0A192F] outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             Special Event? (Optional)
                           </label>
                           <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-[#0A192F]/40">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
                               <CalendarHeart className="size-5" />
                             </div>
                             <input
@@ -574,7 +573,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                                 update("eventType", e.target.value)
                               }
                               placeholder="e.g. Birthday, Team Building..."
-                              className="w-full rounded-xl border-2 border-gray-100 bg-white pl-14 pr-5 py-4 text-sm font-medium text-[#0A192F] outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
                             />
                           </div>
                         </div>
@@ -595,7 +594,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-[#0A192F]">
+                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
                             Payment Method
                           </label>
                           <div className="grid grid-cols-2 gap-4">
@@ -604,19 +603,19 @@ export function BookingModal({ villaId, onClose }: Props) {
                                 key={method}
                                 type="button"
                                 onClick={() => update("payMethod", method)}
-                                className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+                                className={`flex flex-col items-center justify-center p-4  border-2 transition-all duration-200 ${
                                   form.payMethod === method
-                                    ? "border-[#0A192F] bg-[#0A192F] text-white shadow-md"
-                                    : "border-gray-100 bg-white text-gray-500 hover:border-gray-200"
+                                    ? "border-[#0A192F] bg-blush text-bg shadow-md"
+                                    : "border-blush/10 bg-bg text-shadow/70 hover:border-blush/20"
                                 }`}
                               >
                                 {method === "gcash" ? (
                                   <Smartphone
-                                    className={`size-6 mb-2 ${form.payMethod === method ? "text-white" : "text-[#0A192F]"}`}
+                                    className={`size-6 mb-2 ${form.payMethod === method ? "text-bg" : "text-petal"}`}
                                   />
                                 ) : (
                                   <CreditCard
-                                    className={`size-6 mb-2 ${form.payMethod === method ? "text-white" : "text-[#0A192F]"}`}
+                                    className={`size-6 mb-2 ${form.payMethod === method ? "text-bg" : "text-petal"}`}
                                   />
                                 )}
                                 <span className="text-xs font-bold uppercase tracking-wider">
@@ -627,14 +626,14 @@ export function BookingModal({ villaId, onClose }: Props) {
                           </div>
                         </div>
 
-                        <label className="flex cursor-pointer items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
+                        <label className="flex cursor-pointer items-start gap-4 p-4  border border-blush/10 bg-gray-50">
                           <input
                             type="checkbox"
                             checked={form.agree}
                             onChange={(e) => update("agree", e.target.checked)}
                             className="mt-1 size-5 rounded-md border-gray-300 accent-[#0A192F] focus:ring-[#0A192F]"
                           />
-                          <span className="text-xs leading-relaxed text-gray-600">
+                          <span className="text-xs leading-relaxed text-shadow">
                             I agree to the booking terms and cancellation
                             policy. I understand this is a reservation request
                             and requires confirmation before the payment is
@@ -642,10 +641,10 @@ export function BookingModal({ villaId, onClose }: Props) {
                           </span>
                         </label>
 
-                        <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-gray-400">
+                        <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-shadow/50">
                           <Shield className="size-4" /> Secure payment
                           processing powered by{" "}
-                          <strong className="text-[#0A192F] font-bold">
+                          <strong className="text-petal font-bold">
                             PayMongo
                           </strong>
                         </div>
@@ -655,11 +654,11 @@ export function BookingModal({ villaId, onClose }: Props) {
                 </div>
 
                 {/* Footer Navigation */}
-                <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-5 md:static md:p-6 md:border-none flex items-center justify-between z-20">
+                <div className="absolute bottom-0 left-0 right-0 bg-bg border-t border-blush/10 p-5 md:static md:p-6 md:border-none flex items-center justify-between z-20">
                   {step > 1 ? (
                     <button
                       onClick={() => setStep((s) => s - 1)}
-                      className="flex items-center gap-2 rounded-xl bg-gray-50 px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-[#0A192F] hover:bg-gray-100 transition-colors"
+                      className="flex items-center gap-2  bg-gray-50 px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-petal hover:bg-gray-100 transition-colors"
                     >
                       <ChevronLeft className="size-4" /> Back
                     </button>
@@ -671,7 +670,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                     <button
                       onClick={handleNext}
                       disabled={!canProceed() || isSubmitting}
-                      className="flex items-center gap-2 rounded-xl bg-[#0A192F] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-[#0A192F]/20 hover:bg-[#0A192F]/90 transition-all disabled:opacity-50 disabled:shadow-none"
+                      className="flex items-center gap-2  bg-blush px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-bg shadow-lg shadow-[#0A192F]/20 hover:bg-blush/90 transition-all disabled:opacity-50 disabled:shadow-none"
                     >
                       {isSubmitting ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -684,7 +683,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                     <button
                       onClick={handleCompleteBooking}
                       disabled={!canProceed() || isSubmitting}
-                      className="flex items-center gap-2 rounded-xl bg-[#0A192F] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-[#0A192F]/20 hover:bg-[#0A192F]/90 transition-all disabled:opacity-50 disabled:shadow-none"
+                      className="flex items-center gap-2  bg-blush px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-bg shadow-lg shadow-[#0A192F]/20 hover:bg-blush/90 transition-all disabled:opacity-50 disabled:shadow-none"
                     >
                       {isSubmitting ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -700,7 +699,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-600 shadow-md"
+                      className=" border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-600 shadow-md"
                     >
                       {errorMsg}
                     </motion.div>
@@ -709,7 +708,7 @@ export function BookingModal({ villaId, onClose }: Props) {
               </div>
 
               {/* RIGHT SIDE: Sticky Summary (Desktop Only) */}
-              <div className="hidden md:block w-380px bg-[#F7F6F4] p-10 border-l border-gray-100">
+              <div className="hidden md:block w-380px bg-white p-10 border-l border-blush/10">
                 <SummaryContent />
               </div>
             </>
@@ -719,3 +718,6 @@ export function BookingModal({ villaId, onClose }: Props) {
     </AnimatePresence>
   );
 }
+
+
+

@@ -198,10 +198,10 @@ export function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F7F6F4] text-[#0A192F] flex flex-col md:flex-row">
+    <div className="min-h-screen bg-petal text-plum flex flex-col md:flex-row">
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 shrink-0 border-r border-gray-200 bg-white">
-        <div className="flex h-20 items-center justify-between border-b border-gray-200 px-6 md:px-8">
+      <aside className="w-full md:w-64 shrink-0 border-r border-blush/20 bg-white">
+        <div className="flex h-20 items-center justify-between border-b border-blush/20 px-6 md:px-8">
           <img
             src={yuhrumLogo}
             alt="Yuhrum Villas"
@@ -210,7 +210,7 @@ export function AdminPage() {
           <div className="md:hidden">
             <button
               onClick={() => signOut()}
-              className="text-gray-500 hover:text-[#0A192F]"
+              className="text-shadow/70 hover:text-plum"
             >
               <LogOut className="size-5" />
             </button>
@@ -223,25 +223,25 @@ export function AdminPage() {
               onClick={() => setTab(item.id)}
               className={`flex shrink-0 items-center gap-3 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.15em] transition-colors ${
                 tab === item.id
-                  ? "bg-[#0A192F] text-white"
-                  : "text-gray-600 hover:bg-[#F0F4F8] hover:text-[#0A192F]"
+                  ? "bg-plum text-petal"
+                  : "text-shadow hover:bg-petal hover:text-plum"
               }`}
             >
               <item.icon className="size-4" /> {item.label}
             </button>
           ))}
         </nav>
-        <div className="hidden md:block absolute bottom-0 left-0 w-64 border-t border-gray-200 bg-[#F7F6F4] p-4">
+        <div className="hidden md:block absolute bottom-0 left-0 w-64 border-t border-blush/20 bg-petal p-4">
           <a
             href="/"
             target="_blank"
-            className="flex w-full items-center justify-center gap-2 border border-gray-200 bg-white px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#0A192F] hover:border-[#0A192F] transition-colors"
+            className="flex w-full items-center justify-center gap-2 border border-blush/20 bg-white px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-plum hover:border-[#0A192F] transition-colors"
           >
             View Live Site <ArrowUpRight className="size-3" />
           </a>
           <button
             onClick={() => signOut()}
-            className="mt-3 flex w-full items-center justify-center gap-2 btn-navy px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em]"
+            className="mt-3 flex w-full items-center justify-center gap-2 bg-plum text-petal px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] transition-all hover:bg-shadow px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em]"
           >
             <LogOut className="size-3" /> Logout
           </button>
@@ -251,11 +251,11 @@ export function AdminPage() {
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto px-6 py-8 md:p-12">
         <div className="mb-8">
-          <h1 className="font-serif text-4xl text-[#0A192F]">
+          <h1 className="font-display italic text-4xl text-plum">
             {navItems.find((n) => n.id === tab)?.label}
           </h1>
           {loading && (
-            <p className="mt-2 text-[10px] uppercase tracking-widest text-gray-500">
+            <p className="mt-2 text-[10px] uppercase tracking-widest text-shadow/70">
               Syncing database...
             </p>
           )}
@@ -270,11 +270,11 @@ export function AdminPage() {
         {tab === "overview" && (
           <div className="space-y-8">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <div className="border border-gray-200 bg-white p-6 shadow-sm">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">
+              <div className="border border-blush/20 bg-white p-6 shadow-sm">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-shadow/70">
                   Total Bookings
                 </p>
-                <p className="mt-2 font-serif text-4xl text-[#0A192F]">
+                <p className="mt-2 font-display italic text-4xl text-plum">
                   {bookings.length}
                 </p>
                 {pendingCount > 0 && (
@@ -283,38 +283,38 @@ export function AdminPage() {
                   </p>
                 )}
               </div>
-              <div className="border border-gray-200 bg-white p-6 shadow-sm">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">
+              <div className="border border-blush/20 bg-white p-6 shadow-sm">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-shadow/70">
                   Confirmed Revenue
                 </p>
-                <p className="mt-2 font-serif text-4xl text-[#0A192F]">
+                <p className="mt-2 font-display italic text-4xl text-plum">
                   {fmt(totalRevenue)}
                 </p>
               </div>
-              <div className="border border-gray-200 bg-white p-6 shadow-sm">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">
+              <div className="border border-blush/20 bg-white p-6 shadow-sm">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-shadow/70">
                   Active Discounts
                 </p>
-                <p className="mt-2 font-serif text-4xl text-[#0A192F]">
+                <p className="mt-2 font-display italic text-4xl text-plum">
                   {discounts.filter((d) => d.is_active).length}
                 </p>
               </div>
-              <div className="border border-gray-200 bg-white p-6 shadow-sm">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">
+              <div className="border border-blush/20 bg-white p-6 shadow-sm">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-shadow/70">
                   Managed Spaces
                 </p>
-                <p className="mt-2 font-serif text-4xl text-[#0A192F]">
+                <p className="mt-2 font-display italic text-4xl text-plum">
                   {rooms.length}
                 </p>
               </div>
             </div>
 
-            <h2 className="font-serif text-2xl text-[#0A192F] border-b border-gray-200 pb-3 mt-10">
+            <h2 className="font-display italic text-2xl text-plum border-b border-blush/20 pb-3 mt-10">
               Recent Bookings
             </h2>
-            <div className="overflow-x-auto border border-gray-200 bg-white">
+            <div className="overflow-x-auto border border-blush/20 bg-white">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#F7F6F4] text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <thead className="bg-petal text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   <tr>
                     <th className="px-6 py-4 font-semibold">Guest</th>
                     <th className="px-6 py-4 font-semibold">Package</th>
@@ -326,22 +326,22 @@ export function AdminPage() {
                 <tbody className="divide-y divide-gray-100">
                   {bookings.slice(0, 5).map((b) => (
                     <tr key={b.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-[#0A192F]">
+                      <td className="px-6 py-4 font-medium text-plum">
                         {b.guest_name}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">
+                      <td className="px-6 py-4 text-shadow">
                         <div className="flex items-center gap-1.5">
                           {b.stay_type && STAY_LABELS[b.stay_type] && (
                             <>
-                              <span className="text-[#0A192F]">
+                              <span className="text-plum">
                                 {STAY_LABELS[b.stay_type].label}
                               </span>
                             </>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-600">{b.check_in}</td>
-                      <td className="px-6 py-4 text-gray-600">
+                      <td className="px-6 py-4 text-shadow">{b.check_in}</td>
+                      <td className="px-6 py-4 text-shadow">
                         {fmt(b.total_price)}
                       </td>
                       <td className="px-6 py-4">
@@ -363,7 +363,7 @@ export function AdminPage() {
                     <tr>
                       <td
                         colSpan={5}
-                        className="px-6 py-8 text-center text-gray-500"
+                        className="px-6 py-8 text-center text-shadow/70"
                       >
                         No bookings yet.
                       </td>
@@ -378,8 +378,8 @@ export function AdminPage() {
         {/* CALENDAR TAB */}
         {tab === "calendar" && (
           <div className="space-y-6">
-            <div className="border border-gray-200 bg-white p-6 shadow-sm">
-              <p className="text-sm text-gray-600 leading-relaxed">
+            <div className="border border-blush/20 bg-white p-6 shadow-sm">
+              <p className="text-sm text-shadow leading-relaxed">
                 A visual calendar view requires a complex grid component. For
                 now, here is a chronological list of all confirmed upcoming
                 bookings.
@@ -396,9 +396,9 @@ export function AdminPage() {
                 .map((b) => (
                   <div
                     key={b.id}
-                    className="border-l-4 border-#0A192F bg-white border-y border-r border-gray-200 p-5 shadow-sm"
+                    className="border-l-4 border-#0A192F bg-white border-y border-r border-blush/20 p-5 shadow-sm"
                   >
-                    <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-0.1em text-[#0A192F]">
+                    <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-0.1em text-plum">
                       <Calendar className="size-4" /> {b.check_in}
                       {b.stay_type && (
                         <span className="ml-auto bg-gray-100 px-2 py-0.5 rounded text-[9px]">
@@ -406,10 +406,10 @@ export function AdminPage() {
                         </span>
                       )}
                     </div>
-                    <p className="font-serif text-xl text-[#0A192F]">
+                    <p className="font-display italic text-xl text-plum">
                       {b.guest_name}
                     </p>
-                    <p className="text-sm text-gray-500">{b.guests} guests</p>
+                    <p className="text-sm text-shadow/70">{b.guests} guests</p>
                   </div>
                 ))}
             </div>
@@ -418,9 +418,9 @@ export function AdminPage() {
 
         {/* BOOKINGS TAB */}
         {tab === "bookings" && (
-          <div className="overflow-x-auto border border-gray-200 bg-white shadow-sm">
+          <div className="overflow-x-auto border border-blush/20 bg-white shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F7F6F4] text-[10px] uppercase tracking-[0.15em] text-gray-500">
+              <thead className="bg-petal text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                 <tr>
                   <th className="px-6 py-4 font-semibold">Guest Details</th>
                   <th className="px-6 py-4 font-semibold">Stay Details</th>
@@ -436,26 +436,26 @@ export function AdminPage() {
                 {bookings.map((b) => (
                   <tr key={b.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
-                      <p className="font-medium text-[#0A192F]">
+                      <p className="font-medium text-plum">
                         {b.guest_name}
                       </p>
-                      <p className="text-xs text-gray-500">{b.email}</p>
-                      <p className="text-xs text-gray-500">{b.phone || "—"}</p>
+                      <p className="text-xs text-shadow/70">{b.email}</p>
+                      <p className="text-xs text-shadow/70">{b.phone || "—"}</p>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-6 py-4 text-shadow">
                       {b.check_in}
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-shadow/50 mt-1">
                         {b.guests} pax
                       </p>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-6 py-4 text-shadow">
                       <div className="flex flex-col gap-1">
                         <span className="text-sm font-medium">
                           {STAY_LABELS[b.stay_type]?.label || b.stay_type}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-medium text-[#0A192F]">
+                    <td className="px-6 py-4 font-medium text-plum">
                       {fmt(b.total_price)}
                     </td>
                     <td className="px-6 py-4">
@@ -500,7 +500,7 @@ export function AdminPage() {
                             );
                           }
                         }}
-                        className="text-gray-400 hover:text-red-600 transition-colors"
+                        className="text-shadow/50 hover:text-red-600 transition-colors"
                       >
                         <Trash2 className="size-4 ml-auto" />
                       </button>
@@ -511,7 +511,7 @@ export function AdminPage() {
                   <tr>
                     <td
                       colSpan={5}
-                      className="px-6 py-8 text-center text-gray-500"
+                      className="px-6 py-8 text-center text-shadow/70"
                     >
                       No bookings found in the database.
                     </td>
@@ -527,13 +527,13 @@ export function AdminPage() {
           <div className="grid gap-10 lg:grid-cols-[380px_1fr]">
             <form
               onSubmit={handleDiscountSubmit}
-              className="h-fit space-y-5 border border-gray-200 bg-white p-7 shadow-sm"
+              className="h-fit space-y-5 border border-blush/20 bg-white p-7 shadow-sm"
             >
-              <h2 className="font-serif text-2xl text-[#0A192F] border-b border-gray-100 pb-4 mb-6 flex items-center gap-2">
+              <h2 className="font-display italic text-2xl text-plum border-b border-blush/10 pb-4 mb-6 flex items-center gap-2">
                 <Tag className="size-5" /> Generate Discount
               </h2>
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   Promo Code
                 </label>
                 <input
@@ -544,13 +544,13 @@ export function AdminPage() {
                       code: e.target.value.toUpperCase(),
                     }))
                   }
-                  className="w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm font-medium uppercase tracking-widest outline-none focus:border-[#0A192F]"
+                  className="w-full border border-blush/20 bg-petal px-4 py-3 text-sm font-medium uppercase tracking-widest outline-none focus:border-[#0A192F]"
                   placeholder="SUMMER20"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                  <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                     Type
                   </label>
                   <select
@@ -561,14 +561,14 @@ export function AdminPage() {
                         discount_type: e.target.value as any,
                       }))
                     }
-                    className="w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3.5 text-sm outline-none focus:border-[#0A192F]"
+                    className="w-full border border-blush/20 bg-petal px-4 py-3.5 text-sm outline-none focus:border-[#0A192F]"
                   >
                     <option value="percentage">% Percentage</option>
                     <option value="fixed">₱ Fixed Amount</option>
                   </select>
                 </div>
                 <div>
-                  <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                  <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                     Value
                   </label>
                   <input
@@ -581,11 +581,11 @@ export function AdminPage() {
                         amount: Number(e.target.value),
                       }))
                     }
-                    className="w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                    className="w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
                   />
                 </div>
               </div>
-              <button className="w-full btn-navy mt-4 py-3.5 text-xs font-semibold uppercase tracking-[0.15em] flex justify-center items-center gap-2">
+              <button className="w-full bg-plum text-petal px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] transition-all hover:bg-shadow mt-4 py-3.5 text-xs font-semibold uppercase tracking-[0.15em] flex justify-center items-center gap-2">
                 <Plus className="size-4" /> Create Promo Code
               </button>
             </form>
@@ -594,11 +594,11 @@ export function AdminPage() {
               {discounts.map((d) => (
                 <div
                   key={d.id}
-                  className="flex flex-col justify-between border border-gray-200 bg-white p-6 shadow-sm"
+                  className="flex flex-col justify-between border border-blush/20 bg-white p-6 shadow-sm"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-[#0A192F] uppercase tracking-[0.15em] text-lg">
+                      <span className="font-medium text-plum uppercase tracking-[0.15em] text-lg">
                         {d.code}
                       </span>
                       <button
@@ -614,22 +614,22 @@ export function AdminPage() {
                         className={`border px-3 py-1 text-[10px] uppercase tracking-0.1em font-semibold transition-colors ${
                           d.is_active
                             ? "border-green-300 bg-green-50 text-green-700"
-                            : "border-gray-300 bg-gray-50 text-gray-500"
+                            : "border-gray-300 bg-gray-50 text-shadow/70"
                         }`}
                       >
                         {d.is_active ? "Active" : "Disabled"}
                       </button>
                     </div>
-                    <p className="mt-4 text-sm text-gray-600">
+                    <p className="mt-4 text-sm text-shadow">
                       Value:{" "}
-                      <strong className="text-[#0A192F]">
+                      <strong className="text-plum">
                         {d.discount_type === "percentage"
                           ? `${d.amount}% OFF`
                           : `₱${d.amount} OFF`}
                       </strong>
                     </p>
                   </div>
-                  <div className="mt-6 border-t border-gray-100 pt-4 flex justify-end">
+                  <div className="mt-6 border-t border-blush/10 pt-4 flex justify-end">
                     <button
                       onClick={async () => {
                         if (confirm("Delete discount code?")) {
@@ -655,13 +655,13 @@ export function AdminPage() {
           <div className="grid gap-10 lg:grid-cols-[400px_1fr]">
             <form
               onSubmit={handleRoomSubmit}
-              className="h-fit space-y-4 border border-gray-200 bg-white p-7 shadow-sm"
+              className="h-fit space-y-4 border border-blush/20 bg-white p-7 shadow-sm"
             >
-              <h2 className="font-serif text-2xl text-[#0A192F] border-b border-gray-100 pb-4 mb-6">
+              <h2 className="font-display italic text-2xl text-plum border-b border-blush/10 pb-4 mb-6">
                 {editingRoomId ? "Edit Space" : "Add New Space"}
               </h2>
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   Space Name
                 </label>
                 <input
@@ -669,12 +669,12 @@ export function AdminPage() {
                   onChange={(e) =>
                     setRoomForm((v) => ({ ...v, name: e.target.value }))
                   }
-                  className="w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                  className="w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
                   placeholder="e.g. Master Suite"
                 />
               </div>
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   Category
                 </label>
                 <input
@@ -682,12 +682,12 @@ export function AdminPage() {
                   onChange={(e) =>
                     setRoomForm((v) => ({ ...v, category: e.target.value }))
                   }
-                  className="w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                  className="w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
                   placeholder="e.g. Bedroom"
                 />
               </div>
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   Description
                 </label>
                 <textarea
@@ -695,12 +695,12 @@ export function AdminPage() {
                   onChange={(e) =>
                     setRoomForm((v) => ({ ...v, description: e.target.value }))
                   }
-                  className="min-h-24 w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                  className="min-h-24 w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
                   placeholder="Describe the space..."
                 />
               </div>
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   Features Highlights
                 </label>
                 <input
@@ -708,12 +708,12 @@ export function AdminPage() {
                   onChange={(e) =>
                     setRoomForm((v) => ({ ...v, features: e.target.value }))
                   }
-                  className="w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                  className="w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
                   placeholder="e.g. King Bed · Ocean View"
                 />
               </div>
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   Image URL
                 </label>
                 <input
@@ -721,12 +721,12 @@ export function AdminPage() {
                   onChange={(e) =>
                     setRoomForm((v) => ({ ...v, image: e.target.value }))
                   }
-                  className="w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                  className="w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
                   placeholder="https://..."
                 />
               </div>
-              <div className="pt-4 border-t border-gray-100">
-                <button className="w-full btn-navy py-3.5 text-xs font-semibold uppercase tracking-[0.15em]">
+              <div className="pt-4 border-t border-blush/10">
+                <button className="w-full bg-plum text-petal px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] transition-all hover:bg-shadow py-3.5 text-xs font-semibold uppercase tracking-[0.15em]">
                   {editingRoomId ? "Update Space" : "Save New Space"}
                 </button>
                 {editingRoomId && (
@@ -736,7 +736,7 @@ export function AdminPage() {
                       setEditingRoomId(null);
                       setRoomForm(emptyRoom);
                     }}
-                    className="mt-3 w-full border border-gray-200 bg-white py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-600 hover:bg-gray-50"
+                    className="mt-3 w-full border border-blush/20 bg-white py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-shadow hover:bg-gray-50"
                   >
                     Cancel
                   </button>
@@ -748,9 +748,9 @@ export function AdminPage() {
               {rooms.map((room) => (
                 <article
                   key={room.id}
-                  className="flex flex-col sm:flex-row gap-6 border border-gray-200 bg-white p-6 shadow-sm"
+                  className="flex flex-col sm:flex-row gap-6 border border-blush/20 bg-white p-6 shadow-sm"
                 >
-                  <div className="h-40 w-full sm:w-48 shrink-0 overflow-hidden border border-gray-100">
+                  <div className="h-40 w-full sm:w-48 shrink-0 overflow-hidden border border-blush/10">
                     <img
                       src={room.image}
                       alt={room.name}
@@ -759,21 +759,21 @@ export function AdminPage() {
                   </div>
                   <div className="flex flex-col flex-1 justify-between">
                     <div>
-                      <h3 className="font-serif text-2xl text-[#0A192F]">
+                      <h3 className="font-display italic text-2xl text-plum">
                         {room.name}
                       </h3>
-                      <p className="mt-4 text-sm leading-relaxed text-gray-600 line-clamp-2">
+                      <p className="mt-4 text-sm leading-relaxed text-shadow line-clamp-2">
                         {room.description}
                       </p>
                     </div>
-                    <div className="mt-6 flex gap-3 border-t border-gray-100 pt-4">
+                    <div className="mt-6 flex gap-3 border-t border-blush/10 pt-4">
                       <button
                         onClick={() => {
                           setEditingRoomId(room.id);
                           setRoomForm({ ...room });
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        className="flex items-center gap-2 border border-gray-200 bg-[#F7F6F4] px-4 py-2 text-[10px] font-semibold uppercase tracking-0.1em text-[#0A192F] hover:border-[#0A192F] transition-colors"
+                        className="flex items-center gap-2 border border-blush/20 bg-petal px-4 py-2 text-[10px] font-semibold uppercase tracking-0.1em text-plum hover:border-[#0A192F] transition-colors"
                       >
                         <Edit2 className="size-3" /> Edit
                       </button>
@@ -801,13 +801,13 @@ export function AdminPage() {
           <div className="grid gap-10 lg:grid-cols-[400px_1fr]">
             <form
               onSubmit={handleAmenitySubmit}
-              className="h-fit space-y-4 border border-gray-200 bg-white p-7 shadow-sm"
+              className="h-fit space-y-4 border border-blush/20 bg-white p-7 shadow-sm"
             >
-              <h2 className="font-serif text-2xl text-[#0A192F] border-b border-gray-100 pb-4 mb-6">
+              <h2 className="font-display italic text-2xl text-plum border-b border-blush/10 pb-4 mb-6">
                 {editingAmenityId ? "Edit Amenity" : "Add New Amenity"}
               </h2>
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   Title
                 </label>
                 <input
@@ -816,11 +816,11 @@ export function AdminPage() {
                   onChange={(e) =>
                     setAmenityForm((v) => ({ ...v, title: e.target.value }))
                   }
-                  className="w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                  className="w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
                 />
               </div>
               <div>
-                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-gray-500">
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
                   Description
                 </label>
                 <textarea
@@ -829,11 +829,11 @@ export function AdminPage() {
                   onChange={(e) =>
                     setAmenityForm((v) => ({ ...v, text: e.target.value }))
                   }
-                  className="min-h-24 w-full border border-gray-200 bg-[#F7F6F4] px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                  className="min-h-24 w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
                 />
               </div>
-              <div className="pt-4 border-t border-gray-100">
-                <button className="w-full btn-navy py-3.5 text-xs font-semibold uppercase tracking-[0.15em]">
+              <div className="pt-4 border-t border-blush/10">
+                <button className="w-full bg-plum text-petal px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] transition-all hover:bg-shadow py-3.5 text-xs font-semibold uppercase tracking-[0.15em]">
                   {editingAmenityId ? "Update Amenity" : "Save Amenity"}
                 </button>
                 {editingAmenityId && (
@@ -843,7 +843,7 @@ export function AdminPage() {
                       setEditingAmenityId(null);
                       setAmenityForm(emptyAmenity);
                     }}
-                    className="mt-3 w-full border border-gray-200 bg-white py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-600 hover:bg-gray-50"
+                    className="mt-3 w-full border border-blush/20 bg-white py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-shadow hover:bg-gray-50"
                   >
                     Cancel
                   </button>
@@ -855,15 +855,15 @@ export function AdminPage() {
               {amenities.map((amenity) => (
                 <article
                   key={amenity.id}
-                  className="border border-gray-200 bg-white p-6 shadow-sm"
+                  className="border border-blush/20 bg-white p-6 shadow-sm"
                 >
-                  <h3 className="font-serif text-2xl text-[#0A192F]">
+                  <h3 className="font-display italic text-2xl text-plum">
                     {amenity.title}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-gray-600">
+                  <p className="mt-3 text-sm leading-relaxed text-shadow">
                     {amenity.text}
                   </p>
-                  <div className="mt-6 flex gap-3 border-t border-gray-100 pt-4">
+                  <div className="mt-6 flex gap-3 border-t border-blush/10 pt-4">
                     <button
                       onClick={() => {
                         setEditingAmenityId(amenity.id);
@@ -873,7 +873,7 @@ export function AdminPage() {
                         });
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="flex items-center gap-2 border border-gray-200 bg-[#F7F6F4] px-4 py-2 text-[10px] font-semibold uppercase tracking-0.1em text-[#0A192F] hover:border-[#0A192F] transition-colors"
+                      className="flex items-center gap-2 border border-blush/20 bg-petal px-4 py-2 text-[10px] font-semibold uppercase tracking-0.1em text-plum hover:border-[#0A192F] transition-colors"
                     >
                       <Edit2 className="size-3" /> Edit
                     </button>
@@ -900,3 +900,4 @@ export function AdminPage() {
     </div>
   );
 }
+
