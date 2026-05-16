@@ -268,13 +268,17 @@ export function BookingModal({ villaId, onClose }: Props) {
 
         <div className="border-t border-petal/10 pt-8 space-y-5 text-sm text-petal/60">
           <div className="flex justify-between items-center">
-            <span className="text-[10px] uppercase tracking-widest">Date</span>
+            <span className="text-[10px] uppercase tracking-widest flex items-center gap-2">
+              <CalendarHeart className="size-3" strokeWidth={1} /> Date
+            </span>
             <span className="font-medium text-petal">
               {form.date || "Not selected"}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-[10px] uppercase tracking-widest">Guests</span>
+            <span className="text-[10px] uppercase tracking-widest flex items-center gap-2">
+              <Users className="size-3" strokeWidth={1} /> Guests
+            </span>
             <span className="font-medium text-petal">
               {form.guests} pax
             </span>
@@ -410,8 +414,8 @@ export function BookingModal({ villaId, onClose }: Props) {
                         className="space-y-10"
                       >
                         <div className="group">
-                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60">
-                            1. Select Villa
+                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60 flex items-center gap-2">
+                            <Home className="size-3" strokeWidth={1.5} /> 1. Select Villa
                           </label>
                           <div className="relative">
                             <select
@@ -430,8 +434,8 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60">
-                            2. Choose Package
+                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60 flex items-center gap-2">
+                            <Sun className="size-3" strokeWidth={1.5} /> 2. Choose Package
                           </label>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             {(Object.keys(STAY_LABELS) as StayType[]).map((type) => {
@@ -460,8 +464,8 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60">
-                            3. Guest Count
+                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60 flex items-center gap-2">
+                            <Users className="size-3" strokeWidth={1.5} /> 3. Guest Count
                           </label>
                           <div className="relative">
                             <input
@@ -470,7 +474,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                               max={rate.capacity}
                               value={form.guests}
                               onChange={(e) => update("guests", Number(e.target.value))}
-                              className="w-full border border-plum/10 bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none transition-all focus:border-blush focus:bg-white"
+                              className="w-full border border-plum/10 bg-white/50 px-8 py-4.5 text-sm font-medium text-plum outline-none transition-all focus:border-blush focus:bg-white"
                             />
                             <Users className="absolute right-6 top-1/2 -translate-y-1/2 size-4 text-plum/20" strokeWidth={1} />
                           </div>
@@ -480,8 +484,8 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className={`mb-4 block text-[10px] uppercase tracking-[0.25em] ${errorMsg && !form.date ? 'text-red-500' : 'text-plum/60'}`}>
-                            4. Select Date
+                          <label className={`mb-4 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${errorMsg && !form.date ? 'text-red-500' : 'text-plum/60'}`}>
+                            <CalendarHeart className="size-3" strokeWidth={1.5} /> 4. Select Date
                           </label>
                           <div className={`border p-1 bg-white transition-colors ${errorMsg && !form.date ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.2)]' : 'border-plum/10'}`}>
                             <AvailabilityCalendar
@@ -504,42 +508,62 @@ export function BookingModal({ villaId, onClose }: Props) {
                       >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div>
-                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] ${errorMsg && !form.name.trim() ? 'text-red-500' : 'text-plum/60'}`}>Full Name</label>
-                            <input
-                              value={form.name}
-                              onChange={(e) => { update("name", e.target.value); setErrorMsg(""); }}
-                              placeholder="e.g. Juan dela Cruz"
-                              className={`w-full border bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && !form.name.trim() ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
-                            />
+                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${errorMsg && !form.name.trim() ? 'text-red-500' : 'text-plum/60'}`}>
+                              <User className="size-3" strokeWidth={1.5} /> Full Name
+                            </label>
+                            <div className="relative">
+                              <input
+                                value={form.name}
+                                onChange={(e) => { update("name", e.target.value); setErrorMsg(""); }}
+                                placeholder="e.g. Juan dela Cruz"
+                                className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && !form.name.trim() ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
+                              />
+                              <User className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-plum/20" strokeWidth={1} />
+                            </div>
                           </div>
                           <div>
-                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] ${errorMsg && !form.contact.trim() ? 'text-red-500' : 'text-plum/60'}`}>Contact Number</label>
-                            <input
-                              value={form.contact}
-                              onChange={(e) => { update("contact", e.target.value); setErrorMsg(""); }}
-                              placeholder="+63 9xx xxx xxxx"
-                              className={`w-full border bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && !form.contact.trim() ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
-                            />
+                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${errorMsg && !form.contact.trim() ? 'text-red-500' : 'text-plum/60'}`}>
+                              <Phone className="size-3" strokeWidth={1.5} /> Contact Number
+                            </label>
+                            <div className="relative">
+                              <input
+                                value={form.contact}
+                                onChange={(e) => { update("contact", e.target.value); setErrorMsg(""); }}
+                                placeholder="+63 9xx xxx xxxx"
+                                className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && !form.contact.trim() ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
+                              />
+                              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-plum/20" strokeWidth={1} />
+                            </div>
                           </div>
                         </div>
                         <div>
-                          <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] ${errorMsg && (!form.email.trim() || !isValidEmail(form.email)) ? 'text-red-500' : 'text-plum/60'}`}>Email Address</label>
-                          <input
-                            type="email"
-                            value={form.email}
-                            onChange={(e) => { update("email", e.target.value); setErrorMsg(""); }}
-                            placeholder="juan@email.com"
-                            className={`w-full border bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && (!form.email.trim() || !isValidEmail(form.email)) ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
-                          />
+                          <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${errorMsg && (!form.email.trim() || !isValidEmail(form.email)) ? 'text-red-500' : 'text-plum/60'}`}>
+                            <Mail className="size-3" strokeWidth={1.5} /> Email Address
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="email"
+                              value={form.email}
+                              onChange={(e) => { update("email", e.target.value); setErrorMsg(""); }}
+                              placeholder="juan@email.com"
+                              className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && (!form.email.trim() || !isValidEmail(form.email)) ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
+                            />
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-plum/20" strokeWidth={1} />
+                          </div>
                         </div>
                         <div>
-                          <label className="mb-3 block text-[10px] uppercase tracking-[0.25em] text-plum/60">Special Occasion (Optional)</label>
-                          <textarea
-                            value={form.eventType}
-                            onChange={(e) => update("eventType", e.target.value)}
-                            placeholder="e.g. Birthday, Anniversary, Team Building..."
-                            className="w-full min-h-[120px] border border-plum/10 bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all resize-none"
-                          />
+                          <label className="mb-3 block text-[10px] uppercase tracking-[0.25em] text-plum/60 flex items-center gap-2">
+                            <CalendarHeart className="size-3" strokeWidth={1.5} /> Special Occasion (Optional)
+                          </label>
+                          <div className="relative">
+                            <textarea
+                              value={form.eventType}
+                              onChange={(e) => update("eventType", e.target.value)}
+                              placeholder="e.g. Birthday, Anniversary, Team Building..."
+                              className="w-full min-h-[120px] border border-plum/10 bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all resize-none"
+                            />
+                            <CalendarHeart className="absolute left-4 top-5 size-4 text-plum/20" strokeWidth={1} />
+                          </div>
                         </div>
                       </motion.div>
                     )}
