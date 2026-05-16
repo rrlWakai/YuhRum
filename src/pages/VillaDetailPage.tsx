@@ -209,7 +209,7 @@ export function VillaDetailPage({ villaId, onNavigate, onReserve }: Props) {
                     </div>
                   </div>
                   <button onClick={() => onReserve(villa.id)}
-                    className="mt-8 w-full border border-plum/20 py-3 font-body text-[10px] uppercase tracking-[0.2em] text-plum hover:bg-plum hover:text-petal transition-all">
+                    className="mt-8 w-full bg-plum py-4 font-body text-[10px] uppercase tracking-[0.2em] text-petal hover:bg-shadow transition-all shadow-lg shadow-plum/10">
                     Book {label}
                   </button>
                 </motion.div>

@@ -83,23 +83,18 @@ export function BookingModal({ villaId, onClose }: Props) {
   }
 
   useEffect(() => {
-    // When modal opens, pre-fetch latest availability
     refetch();
   }, []);
 
   useEffect(() => {
-    // Keep guests within selected villa capacity when changing villa.
     if (form.guests > rate.capacity) {
       update("guests", rate.capacity);
     }
   }, [form.selectedVillaId]);
 
   function canProceed() {
-    if (step === 1)
-      return form.date && !blockedDates.get(form.date)?.has(form.stayType) && form.guests >= 1;
-    if (step === 2)
-      return form.name.trim() && form.contact.trim() && form.email.trim();
-    if (step === 3) return form.agree;
+    if (isSubmitting) return false;
+    // We allow proceeding to trigger validation messages in handleNext
     return true;
   }
 
@@ -110,7 +105,14 @@ export function BookingModal({ villaId, onClose }: Props) {
   async function handleNext() {
     setErrorMsg("");
     if (step === 1) {
-      // Validate date again before proceeding
+      if (!form.date) {
+        setErrorMsg("Please select an available date for your stay.");
+        return;
+      }
+      if (form.guests < 1) {
+        setErrorMsg("Guest count must be at least 1.");
+        return;
+      }
       setIsSubmitting(true);
       await refetch();
       if (blockedDates.get(form.date)?.has(form.stayType)) {
@@ -122,6 +124,24 @@ export function BookingModal({ villaId, onClose }: Props) {
       }
       setIsSubmitting(false);
     }
+    if (step === 2) {
+      if (!form.name.trim()) {
+        setErrorMsg("Full name is required to process your reservation.");
+        return;
+      }
+      if (!form.contact.trim()) {
+        setErrorMsg("A contact number is required so we can reach you.");
+        return;
+      }
+      if (!form.email.trim()) {
+        setErrorMsg("Email address is required for your booking confirmation.");
+        return;
+      }
+      if (!isValidEmail(form.email)) {
+        setErrorMsg("Please enter a valid email address.");
+        return;
+      }
+    }
     setStep((s) => s + 1);
   }
 
@@ -131,7 +151,11 @@ export function BookingModal({ villaId, onClose }: Props) {
     setToastMsg("");
 
     try {
-      // Final availability check before inserting
+      if (!form.agree) {
+        setErrorMsg("You must agree to the terms and cancellation policy to proceed.");
+        setIsSubmitting(false);
+        return;
+      }
       await refetch();
       if (blockedDates.get(form.date)?.has(form.stayType)) {
         throw new Error(
@@ -146,7 +170,6 @@ export function BookingModal({ villaId, onClose }: Props) {
       }
 
       const d = new Date(form.date);
-      // DB enforces check_out > check_in; date-only stays still need next-day checkout date.
       d.setDate(d.getDate() + 1);
       const checkOutDate = d.toISOString().split("T")[0];
 
@@ -171,7 +194,6 @@ export function BookingModal({ villaId, onClose }: Props) {
 
       if (error) throw error;
 
-      // Invoke PayMongo Checkout Edge Function
       const { data: edgeData, error: edgeError } =
         await supabase.functions.invoke("create-paymongo-checkout", {
           body: {
@@ -188,10 +210,7 @@ export function BookingModal({ villaId, onClose }: Props) {
         if (edgeError instanceof FunctionsHttpError) {
           try {
             const body = await edgeError.context.json();
-            const message =
-              body?.error?.message ||
-              body?.message ||
-              "Unable to create checkout session.";
+            const message = body?.error?.message || body?.message || "Unable to create checkout session.";
             throw new Error(message);
           } catch {
             throw new Error("Unable to create checkout session.");
@@ -219,42 +238,43 @@ export function BookingModal({ villaId, onClose }: Props) {
     }
   }
 
-  // --- Sticky Summary Component ---
   const SummaryContent = () => (
-    <div className="flex flex-col h-full">
-      <h3 className="font-display italic text-2xl text-petal mb-6 hidden md:block">
+    <div className="flex flex-col h-full font-body">
+      <h3 className="font-display italic text-2xl text-blush mb-8 hidden md:block">
         Booking Summary
       </h3>
 
-      <div className="flex-1 space-y-6">
-        <div className="flex items-start gap-4">
-          <img
-            src={selectedVilla.coverImage}
-            alt={selectedVilla.name}
-            className="w-24 h-24 object-cover  border border-blush/20"
-          />
+      <div className="flex-1 space-y-8">
+        <div className="flex items-start gap-5">
+          <div className="relative w-24 h-24 shrink-0 overflow-hidden border border-blush/20">
+            <img
+              src={selectedVilla.coverImage}
+              alt={selectedVilla.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-shadow/70">
-              Private Villa
+            <p className="text-[9px] uppercase tracking-[0.25em] text-petal/40 mb-1">
+              Selected Sanctuary
             </p>
-            <p className="font-display italic text-lg text-petal">
+            <p className="font-display italic text-xl text-petal">
               {selectedVilla.name}
             </p>
-            <p className="text-sm text-shadow mt-1">
+            <p className="text-[10px] uppercase tracking-widest text-blush/80 mt-2">
               {STAY_LABELS[form.stayType].label}
             </p>
           </div>
         </div>
 
-        <div className="border-t border-blush/20 pt-6 space-y-4 text-sm text-petal/70">
-          <div className="flex justify-between">
-            <span>Date</span>
+        <div className="border-t border-petal/10 pt-8 space-y-5 text-sm text-petal/60">
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] uppercase tracking-widest">Date</span>
             <span className="font-medium text-petal">
               {form.date || "Not selected"}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span>Guests</span>
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] uppercase tracking-widest">Guests</span>
             <span className="font-medium text-petal">
               {form.guests} pax
             </span>
@@ -262,7 +282,7 @@ export function BookingModal({ villaId, onClose }: Props) {
         </div>
 
         {form.date && (
-          <div className="border-t border-blush/20 pt-6 space-y-3 text-sm text-petal/70">
+          <div className="border-t border-petal/10 pt-8 space-y-4 text-sm text-petal/60">
             <div className="flex justify-between">
               <span>
                 {STAY_LABELS[form.stayType].label} (
@@ -271,7 +291,7 @@ export function BookingModal({ villaId, onClose }: Props) {
               <span>{formatPrice(basePrice)}</span>
             </div>
             {extraGuests > 0 && (
-              <div className="flex justify-between text-shadow/70">
+              <div className="flex justify-between text-petal/40">
                 <span>Extra guests ({extraGuests} × ₱500)</span>
                 <span>{formatPrice(extraFee)}</span>
               </div>
@@ -280,17 +300,17 @@ export function BookingModal({ villaId, onClose }: Props) {
         )}
       </div>
 
-      <div className="mt-6 border-t border-[#D1DEEA] pt-6">
+      <div className="mt-8 border-t border-petal/10 pt-8">
         <div className="flex justify-between items-end mb-1">
-          <span className="text-xs font-semibold uppercase tracking-[0.15em] text-petal">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-blush">
             Total Due
           </span>
-          <span className="font-display italic text-3xl text-petal">
+          <span className="font-display italic text-4xl text-petal">
             {formatPrice(total)}
           </span>
         </div>
-        <p className="text-xs text-shadow/70 text-right">
-          Includes all taxes and fees
+        <p className="text-[9px] text-petal/30 uppercase tracking-widest text-right">
+          All-inclusive experience
         </p>
       </div>
     </div>
@@ -305,7 +325,7 @@ export function BookingModal({ villaId, onClose }: Props) {
         className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 lg:p-10"
       >
         <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className="absolute inset-0 bg-plum/60 backdrop-blur-md"
           onClick={onClose}
         />
 
@@ -314,69 +334,72 @@ export function BookingModal({ villaId, onClose }: Props) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.98 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="relative z-10 w-full h-full md:h-[85vh] md:max-h-800px md:max-w-4xl lg:max-w-5xl bg-petal md:flex flex-col md:flex-row overflow-hidden shadow-2xl"
+          className="relative z-10 w-full h-full md:h-[90vh] md:max-h-[850px] md:max-w-5xl bg-petal md:flex flex-col md:flex-row overflow-hidden shadow-[0_32px_64px_-16px_rgba(46,26,36,0.3)]"
           onClick={(e) => e.stopPropagation()}
         >
           {isSuccess ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-10 text-center bg-bg">
-              <div className="mx-auto flex size-20 items-center justify-center  bg-[#EBF5EF] text-[#3D6B52] mb-8 ring-8 ring-[#EBF5EF]/50">
-                <Check className="size-10" />
+            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-petal">
+              <div className="mx-auto flex size-24 items-center justify-center bg-blush/20 text-plum mb-10 border border-blush/30">
+                <Check className="size-10" strokeWidth={1.5} />
               </div>
-              <h2 className="font-display italic text-4xl text-petal">
-                Booking Request Sent
+              <h2 className="font-display italic text-5xl text-plum">
+                Sanctuary Reserved
               </h2>
-              <p className="mt-4 max-w-sm text-shadow leading-relaxed">
-                Your reservation request is confirmed. We've sent a detailed
-                email with your itinerary and payment instructions.
+              <p className="mt-6 max-w-sm text-shadow leading-relaxed font-body text-sm opacity-80">
+                Your reservation request has been received. A detailed itinerary
+                and payment instructions have been sent to your email.
               </p>
               <button
                 onClick={onClose}
-                className="mt-10 bg-blush font-body text-[10px] uppercase tracking-[0.2em] text-bg hover:bg-petal transition-all px-10 py-4 text-xs font-semibold uppercase tracking-[0.15em]"
+                className="mt-12 bg-plum text-petal px-12 py-4 text-[10px] uppercase tracking-[0.25em] transition-all hover:bg-shadow"
               >
-                Return to Website
+                Return Home
               </button>
             </div>
           ) : (
             <>
               {/* LEFT SIDE: Form Steps */}
-              <div className="flex-1 flex flex-col h-full bg-bg relative overflow-hidden">
+              <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-petal">
                 {toastMsg && (
                   <div className="absolute top-4 left-4 right-4 z-30">
-                    <div className=" border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-700 shadow-sm">
+                    <div className="border border-gold/20 bg-gold/5 p-4 text-[10px] uppercase tracking-widest text-gold text-center">
                       {toastMsg}
                     </div>
                   </div>
                 )}
-                {/* Mobile Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-blush/10 bg-bg z-10 md:px-10 md:py-6 md:border-none">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-6 md:px-12 md:py-10">
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-petal/60">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-plum/40 mb-2">
                       Step {step} of {STEP_LABELS.length}
                     </p>
-                    <p className="font-display italic text-2xl text-petal mt-1">
+                    <h2 className="font-display italic text-3xl text-plum">
                       {STEP_LABELS[step - 1]}
-                    </p>
+                    </h2>
                   </div>
                   <button
                     onClick={onClose}
-                    className="flex size-10 items-center justify-center  bg-gray-50 text-shadow/70 hover:bg-gray-100 transition-colors"
+                    className="flex size-10 items-center justify-center border border-plum/10 text-plum/60 hover:text-plum hover:bg-plum/5 transition-all"
                   >
-                    <X className="size-5" />
+                    <X className="size-5" strokeWidth={1.5} />
                   </button>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="flex bg-gray-100 h-1 w-full">
-                  {STEP_LABELS.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-full flex-1 transition-colors duration-500 ${i + 1 <= step ? "bg-blush" : "bg-transparent"}`}
+                {/* Progress */}
+                <div className="flex h-[2px] w-full bg-plum/5 px-6 md:px-12">
+                  <div className="relative h-full w-full">
+                    <motion.div 
+                      className="absolute inset-y-0 left-0 bg-blush"
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${(step / STEP_LABELS.length) * 100}%` }}
+                      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     />
-                  ))}
+                  </div>
                 </div>
 
-                {/* Main Scrollable Content */}
-                <div className="flex-1 overflow-y-auto px-5 py-6 md:px-10 md:py-8 pb-32 md:pb-8 scrollbar-hide relative">
+                {/* Content Area */}
+                <div className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 pb-32 md:pb-32 scrollbar-hide">
                   <AnimatePresence mode="wait">
                     {step === 1 && (
                       <motion.div
@@ -384,118 +407,89 @@ export function BookingModal({ villaId, onClose }: Props) {
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
-                        className="space-y-8"
+                        className="space-y-10"
                       >
-                        <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            1. Choose Villa
+                        <div className="group">
+                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60">
+                            1. Select Villa
                           </label>
                           <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
-                              <Home className="size-5" />
-                            </div>
                             <select
                               value={form.selectedVillaId}
-                              onChange={(e) =>
-                                update("selectedVillaId", e.target.value)
-                              }
-                              className="w-full appearance-none  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              onChange={(e) => update("selectedVillaId", e.target.value)}
+                              className="w-full appearance-none border border-plum/10 bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none transition-all focus:border-blush focus:bg-white"
                             >
                               {villas.map((villa) => (
                                 <option key={villa.id} value={villa.id}>
-                                  {villa.name} (up to {villa.capacity.max}{" "}
-                                  guests)
+                                  {villa.name} (Max {villa.capacity.max} guests)
                                 </option>
                               ))}
                             </select>
+                            <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 size-4 text-plum/30 rotate-90" />
                           </div>
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            2. Choose Your Package
+                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60">
+                            2. Choose Package
                           </label>
-                          <div className="grid grid-cols-3 gap-3">
-                            {(Object.keys(STAY_LABELS) as StayType[]).map(
-                              (type) => {
-                                const { label, sub, Icon } = STAY_LABELS[type];
-                                const active = form.stayType === type;
-                                return (
-                                  <button
-                                    key={type}
-                                    type="button"
-                                    onClick={() => update("stayType", type)}
-                                    className={`flex flex-col items-center justify-center p-4  border-2 transition-all duration-200 ${
-                                      active
-                                        ? "border-[#0A192F] bg-blush text-bg shadow-md"
-                                        : "border-blush/10 bg-bg text-shadow/70 hover:border-blush/20"
-                                    }`}
-                                  >
-                                    <Icon
-                                      className={`size-5 mb-2 ${active ? "text-bg" : "text-petal"}`}
-                                    />
-                                    <span className="text-xs font-bold uppercase tracking-wider">
-                                      {label}
-                                    </span>
-                                    <span
-                                      className={`text-[9px] uppercase tracking-widest mt-1 ${active ? "text-bg/70" : "text-shadow/50"}`}
-                                    >
-                                      {sub}
-                                    </span>
-                                  </button>
-                                );
-                              },
-                            )}
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {(Object.keys(STAY_LABELS) as StayType[]).map((type) => {
+                              const { label, sub, Icon } = STAY_LABELS[type];
+                              const active = form.stayType === type;
+                              return (
+                                <button
+                                  key={type}
+                                  type="button"
+                                  onClick={() => update("stayType", type)}
+                                  className={`flex flex-col items-center justify-center p-6 border transition-all duration-300 ${
+                                    active
+                                      ? "border-plum bg-plum text-petal"
+                                      : "border-plum/10 bg-white/50 text-plum hover:border-plum/30"
+                                  }`}
+                                >
+                                  <Icon className={`size-5 mb-3 ${active ? "text-blush" : "text-plum/60"}`} strokeWidth={1} />
+                                  <span className="text-[10px] font-bold uppercase tracking-[0.15em]">{label}</span>
+                                  <span className={`text-[8px] uppercase tracking-widest mt-1.5 opacity-60`}>
+                                    {sub}
+                                  </span>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            3. Select Date
-                          </label>
-                          {/* We use our premium Availability Calendar */}
-                          <div className="bg-white p-1  border border-blush/10">
-                            <AvailabilityCalendar
-                              stayType={form.stayType}
-                              selectedDate={form.date}
-                              onSelect={(d) => update("date", d)}
-                            />
-                          </div>
-                          {form.date && (
-                            <motion.p
-                              initial={{ opacity: 0, y: -5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="mt-3 text-[11px] font-medium uppercase tracking-widest text-[#3D6B52] flex items-center gap-1.5"
-                            >
-                              <Check className="size-3" /> Date selected.{" "}
-                              {isWknd ? "Weekend" : "Weekday"} rate applies.
-                            </motion.p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            4. Guest Count
+                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60">
+                            3. Guest Count
                           </label>
                           <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
-                              <Users className="size-5" />
-                            </div>
                             <input
                               type="number"
                               min={1}
                               max={rate.capacity}
                               value={form.guests}
-                              onChange={(e) =>
-                                update("guests", Number(e.target.value))
-                              }
-                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              onChange={(e) => update("guests", Number(e.target.value))}
+                              className="w-full border border-plum/10 bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none transition-all focus:border-blush focus:bg-white"
+                            />
+                            <Users className="absolute right-6 top-1/2 -translate-y-1/2 size-4 text-plum/20" strokeWidth={1} />
+                          </div>
+                          <p className="mt-3 text-[9px] uppercase tracking-widest text-shadow/60">
+                            Max {rate.capacity} guests. +₱500 per extra guest after {selectedVilla.capacity.base}.
+                          </p>
+                        </div>
+
+                        <div>
+                          <label className={`mb-4 block text-[10px] uppercase tracking-[0.25em] ${errorMsg && !form.date ? 'text-red-500' : 'text-plum/60'}`}>
+                            4. Select Date
+                          </label>
+                          <div className={`border p-1 bg-white transition-colors ${errorMsg && !form.date ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.2)]' : 'border-plum/10'}`}>
+                            <AvailabilityCalendar
+                              stayType={form.stayType}
+                              selectedDate={form.date}
+                              onSelect={(d) => { update("date", d); setErrorMsg(""); }}
                             />
                           </div>
-                          <p className="mt-2 text-[10px] uppercase tracking-widest text-shadow/70">
-                            Max {rate.capacity} guests. +₱500 per extra guest
-                            after {selectedVilla.capacity.base}.
-                          </p>
                         </div>
                       </motion.div>
                     )}
@@ -506,76 +500,46 @@ export function BookingModal({ villaId, onClose }: Props) {
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
-                        className="space-y-6"
+                        className="space-y-8"
                       >
-                        <div>
-                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            Full Name
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
-                              <User className="size-5" />
-                            </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div>
+                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] ${errorMsg && !form.name.trim() ? 'text-red-500' : 'text-plum/60'}`}>Full Name</label>
                             <input
                               value={form.name}
-                              onChange={(e) => update("name", e.target.value)}
-                              placeholder="Juan dela Cruz"
-                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              onChange={(e) => { update("name", e.target.value); setErrorMsg(""); }}
+                              placeholder="e.g. Juan dela Cruz"
+                              className={`w-full border bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && !form.name.trim() ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
                             />
                           </div>
-                        </div>
-                        <div>
-                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            Contact Number
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
-                              <Phone className="size-5" />
-                            </div>
+                          <div>
+                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] ${errorMsg && !form.contact.trim() ? 'text-red-500' : 'text-plum/60'}`}>Contact Number</label>
                             <input
                               value={form.contact}
-                              onChange={(e) =>
-                                update("contact", e.target.value)
-                              }
-                              placeholder="+63 912 345 6789"
-                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
+                              onChange={(e) => { update("contact", e.target.value); setErrorMsg(""); }}
+                              placeholder="+63 9xx xxx xxxx"
+                              className={`w-full border bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && !form.contact.trim() ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            Email Address
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
-                              <Mail className="size-5" />
-                            </div>
-                            <input
-                              type="email"
-                              value={form.email}
-                              onChange={(e) => update("email", e.target.value)}
-                              placeholder="juan@email.com"
-                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
-                            />
-                          </div>
+                          <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] ${errorMsg && (!form.email.trim() || !isValidEmail(form.email)) ? 'text-red-500' : 'text-plum/60'}`}>Email Address</label>
+                          <input
+                            type="email"
+                            value={form.email}
+                            onChange={(e) => { update("email", e.target.value); setErrorMsg(""); }}
+                            placeholder="juan@email.com"
+                            className={`w-full border bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && (!form.email.trim() || !isValidEmail(form.email)) ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
+                          />
                         </div>
                         <div>
-                          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            Special Event? (Optional)
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none text-petal/40">
-                              <CalendarHeart className="size-5" />
-                            </div>
-                            <input
-                              value={form.eventType}
-                              onChange={(e) =>
-                                update("eventType", e.target.value)
-                              }
-                              placeholder="e.g. Birthday, Team Building..."
-                              className="w-full  border-2 border-blush/10 bg-bg pl-14 pr-5 py-4 text-sm font-medium text-petal outline-none transition-all focus:border-[#0A192F] focus:ring-4 focus:ring-[#0A192F]/10"
-                            />
-                          </div>
+                          <label className="mb-3 block text-[10px] uppercase tracking-[0.25em] text-plum/60">Special Occasion (Optional)</label>
+                          <textarea
+                            value={form.eventType}
+                            onChange={(e) => update("eventType", e.target.value)}
+                            placeholder="e.g. Birthday, Anniversary, Team Building..."
+                            className="w-full min-h-[120px] border border-plum/10 bg-white/50 px-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all resize-none"
+                          />
                         </div>
                       </motion.div>
                     )}
@@ -586,129 +550,111 @@ export function BookingModal({ villaId, onClose }: Props) {
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
-                        className="space-y-8"
+                        className="space-y-10"
                       >
-                        {/* Mobile Summary shows here since right panel is hidden */}
-                        <div className="md:hidden">
+                        <div className="md:hidden border border-plum/10 p-6 bg-white/50">
                           <SummaryContent />
                         </div>
 
                         <div>
-                          <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.15em] text-petal">
-                            Payment Method
-                          </label>
+                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60">Payment Method</label>
                           <div className="grid grid-cols-2 gap-4">
-                            {(["gcash", "card"] as const).map((method) => (
-                              <button
-                                key={method}
-                                type="button"
-                                onClick={() => update("payMethod", method)}
-                                className={`flex flex-col items-center justify-center p-4  border-2 transition-all duration-200 ${
-                                  form.payMethod === method
-                                    ? "border-[#0A192F] bg-blush text-bg shadow-md"
-                                    : "border-blush/10 bg-bg text-shadow/70 hover:border-blush/20"
-                                }`}
-                              >
-                                {method === "gcash" ? (
-                                  <Smartphone
-                                    className={`size-6 mb-2 ${form.payMethod === method ? "text-bg" : "text-petal"}`}
-                                  />
-                                ) : (
-                                  <CreditCard
-                                    className={`size-6 mb-2 ${form.payMethod === method ? "text-bg" : "text-petal"}`}
-                                  />
-                                )}
-                                <span className="text-xs font-bold uppercase tracking-wider">
-                                  {method === "gcash" ? "GCash" : "Visa / Card"}
-                                </span>
-                              </button>
-                            ))}
+                            {(["gcash", "card"] as const).map((method) => {
+                              const active = form.payMethod === method;
+                              return (
+                                <button
+                                  key={method}
+                                  type="button"
+                                  onClick={() => update("payMethod", method)}
+                                  className={`flex flex-col items-center justify-center p-8 border transition-all duration-300 ${
+                                    active
+                                      ? "border-plum bg-plum text-petal"
+                                      : "border-plum/10 bg-white/50 text-plum hover:border-plum/30"
+                                  }`}
+                                >
+                                  {method === "gcash" ? (
+                                    <Smartphone className={`size-6 mb-3 ${active ? "text-blush" : "text-plum/30"}`} strokeWidth={1} />
+                                  ) : (
+                                    <CreditCard className={`size-6 mb-3 ${active ? "text-blush" : "text-plum/30"}`} strokeWidth={1} />
+                                  )}
+                                  <span className="text-[10px] font-bold uppercase tracking-[0.15em]">
+                                    {method === "gcash" ? "GCash" : "Visa / Mastercard"}
+                                  </span>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
 
-                        <label className="flex cursor-pointer items-start gap-4 p-4  border border-blush/10 bg-gray-50">
-                          <input
-                            type="checkbox"
-                            checked={form.agree}
-                            onChange={(e) => update("agree", e.target.checked)}
-                            className="mt-1 size-5 rounded-md border-gray-300 accent-[#0A192F] focus:ring-[#0A192F]"
-                          />
-                          <span className="text-xs leading-relaxed text-shadow">
-                            I agree to the booking terms and cancellation
-                            policy. I understand this is a reservation request
-                            and requires confirmation before the payment is
-                            fully settled.
+                        <label className="flex cursor-pointer items-start gap-4 p-6 border border-plum/10 bg-white/30 transition-colors hover:bg-white/50">
+                          <div className="relative flex items-center justify-center mt-1">
+                            <input
+                              type="checkbox"
+                              checked={form.agree}
+                              onChange={(e) => update("agree", e.target.checked)}
+                              className="peer h-5 w-5 appearance-none border border-plum/20 bg-white checked:bg-plum checked:border-plum transition-all"
+                            />
+                            <Check className="absolute size-3.5 text-petal opacity-0 peer-checked:opacity-100 transition-opacity" />
+                          </div>
+                          <span className="text-[11px] leading-relaxed text-plum/70 font-body">
+                            I agree to the <span className="text-plum font-semibold underline decoration-blush/40 underline-offset-4">Terms and Conditions</span> and Cancellation Policy. I understand that my booking is subject to final confirmation.
                           </span>
                         </label>
 
-                        <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-shadow/50">
-                          <Shield className="size-4" /> Secure payment
-                          processing powered by{" "}
-                          <strong className="text-petal font-bold">
-                            PayMongo
-                          </strong>
+                        <div className="flex items-center justify-center gap-3 text-[9px] uppercase tracking-[0.2em] text-plum/40">
+                          <Shield className="size-4 opacity-50" strokeWidth={1} />
+                          Encrypted payment secured by PayMongo
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
-                {/* Footer Navigation */}
-                <div className="absolute bottom-0 left-0 right-0 bg-bg border-t border-blush/10 p-5 md:static md:p-6 md:border-none flex items-center justify-between z-20">
+                {/* Sticky Footer */}
+                <div className="absolute bottom-0 left-0 right-0 bg-petal/80 backdrop-blur-md border-t border-plum/10 p-6 md:p-12 flex items-center justify-between z-20">
                   {step > 1 ? (
                     <button
                       onClick={() => setStep((s) => s - 1)}
-                      className="flex items-center gap-2  bg-gray-50 px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-petal hover:bg-gray-100 transition-colors"
+                      className="flex items-center gap-3 px-8 py-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-plum/60 hover:text-plum transition-all"
                     >
-                      <ChevronLeft className="size-4" /> Back
+                      <ChevronLeft className="size-4" strokeWidth={1.5} /> Back
                     </button>
                   ) : (
                     <div />
                   )}
 
-                  {step < 3 ? (
-                    <button
-                      onClick={handleNext}
-                      disabled={!canProceed() || isSubmitting}
-                      className="flex items-center gap-2  bg-blush px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-bg shadow-lg shadow-[#0A192F]/20 hover:bg-blush/90 transition-all disabled:opacity-50 disabled:shadow-none"
-                    >
-                      {isSubmitting ? (
-                        <Loader2 className="size-4 animate-spin" />
-                      ) : (
-                        "Continue"
-                      )}{" "}
-                      <ChevronRight className="size-4" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleCompleteBooking}
-                      disabled={!canProceed() || isSubmitting}
-                      className="flex items-center gap-2  bg-blush px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-bg shadow-lg shadow-[#0A192F]/20 hover:bg-blush/90 transition-all disabled:opacity-50 disabled:shadow-none"
-                    >
-                      {isSubmitting ? (
-                        <Loader2 className="size-4 animate-spin" />
-                      ) : (
-                        "Confirm & Pay"
-                      )}
-                    </button>
-                  )}
+                  <button
+                    onClick={step < 3 ? handleNext : handleCompleteBooking}
+                    disabled={!canProceed() || isSubmitting}
+                    className="flex items-center justify-center gap-3 bg-plum text-petal px-12 py-4 text-[10px] font-semibold uppercase tracking-[0.25em] shadow-xl shadow-plum/20 hover:bg-shadow transition-all disabled:opacity-30 disabled:shadow-none"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <>
+                        {step === 3 ? "Confirm & Pay" : "Continue"}
+                        <ChevronRight className="size-4" strokeWidth={1.5} />
+                      </>
+                    )}
+                  </button>
                 </div>
 
                 {errorMsg && (
-                  <div className="absolute top-20 left-4 right-4 z-30">
+                  <div className="absolute top-24 left-6 right-6 z-40">
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className=" border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-600 shadow-md"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="border border-red-200 bg-red-50 p-5 text-xs font-medium text-red-700 shadow-xl flex items-start gap-3"
                     >
+                      <X className="size-4 shrink-0 mt-0.5" />
                       {errorMsg}
                     </motion.div>
                   </div>
                 )}
               </div>
 
-              {/* RIGHT SIDE: Sticky Summary (Desktop Only) */}
-              <div className="hidden md:block w-380px bg-white p-10 border-l border-blush/10">
+              {/* RIGHT SIDE: Summary (Desktop) */}
+              <div className="hidden md:block w-[400px] bg-plum p-12 border-l border-plum/10">
                 <SummaryContent />
               </div>
             </>
@@ -718,6 +664,3 @@ export function BookingModal({ villaId, onClose }: Props) {
     </AnimatePresence>
   );
 }
-
-
-

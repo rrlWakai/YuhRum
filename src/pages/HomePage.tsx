@@ -131,7 +131,7 @@ export function HomePage({ onNavigate, onReserve }: Props) {
             </button>
             <button
               onClick={() => onReserve(villas[0].id)}
-              className="font-body text-[10px] uppercase tracking-[0.25em] text-petal border border-petal/40 px-8 py-3.5 transition-all duration-300 hover:border-petal hover:bg-petal/10"
+              className="font-body text-[10px] uppercase tracking-[0.25em] text-plum bg-blush px-8 py-3.5 transition-all duration-300 hover:bg-petal"
             >
               Reserve Now
             </button>
@@ -364,7 +364,7 @@ export function HomePage({ onNavigate, onReserve }: Props) {
           </p>
           <button
             onClick={() => onReserve(villas[0].id)}
-            className="blush-link mt-12"
+            className="mt-12 bg-blush text-plum px-12 py-4 text-[10px] uppercase tracking-[0.25em] transition-all hover:bg-petal shadow-xl shadow-black/20"
           >
             Begin Your Reservation
           </button>
