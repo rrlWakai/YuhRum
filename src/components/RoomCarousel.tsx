@@ -41,8 +41,10 @@ export function RoomCarousel({ rooms, onSelect }: RoomCarouselProps) {
   const onScroll = () => {
     const node = scrollRef.current;
     if (!node) return;
-    const itemWidth = node.clientWidth * 0.82;
-    const next = Math.round(node.scrollLeft / itemWidth);
+    const scrollLeft = node.scrollLeft;
+    const itemWidth = node.querySelector("article")?.offsetWidth || 0;
+    const gap = 24; // gap-6
+    const next = Math.round(scrollLeft / (itemWidth + gap));
     setActiveIndex(Math.max(0, Math.min(rooms.length - 1, next)));
   };
 
@@ -51,7 +53,7 @@ export function RoomCarousel({ rooms, onSelect }: RoomCarouselProps) {
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-[8vw] pb-4 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-10 pb-12 pt-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-[15vw] md:px-[20vw]"
       >
         {rooms.map((room, index) => (
           <motion.article
@@ -65,9 +67,9 @@ export function RoomCarousel({ rooms, onSelect }: RoomCarouselProps) {
               ease: [0.22, 1, 0.36, 1],
             }}
             animate={{ scale: activeIndex === index ? 1.03 : 0.96 }}
-            className="group relative min-w-[85%] snap-center overflow-hidden border border-gray-200 bg-white sm:min-w-[70%] md:min-w-[58%] xl:min-w-[42%]"
+            className="group relative min-w-[75vw] snap-center overflow-hidden border border-gray-200 bg-white sm:min-w-[60vw] md:min-w-[45vw] lg:min-w-[32vw]"
           >
-            <div className="relative w-full aspect-[3/4] overflow-hidden sm:aspect-[4/5] md:aspect-[3/4] lg:h-[700px]">
+            <div className="relative w-full aspect-[2/3] overflow-hidden sm:aspect-[2/3] lg:h-[750px]">
               <motion.img
                 src={room.image}
                 alt={room.name}
