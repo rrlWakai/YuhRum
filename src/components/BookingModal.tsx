@@ -65,6 +65,7 @@ export function BookingModal({ villaId, onClose }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [toastMsg, setToastMsg] = useState("");
 
   const { blockedDates, refetch } = useAvailability();
@@ -99,7 +100,13 @@ export function BookingModal({ villaId, onClose }: Props) {
   }
 
   function isValidEmail(email: string) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+  }
+
+  function isValidPhone(phone: string) {
+    // Basic check for +639xx, 09xx, or international formats
+    const clean = phone.replace(/[\s\-\(\)]/g, "");
+    return /^(09|\+639)\d{9}$/.test(clean) || /^\+\d{10,15}$/.test(clean);
   }
 
   async function handleNext() {
@@ -125,20 +132,25 @@ export function BookingModal({ villaId, onClose }: Props) {
       setIsSubmitting(false);
     }
     if (step === 2) {
-      if (!form.name.trim()) {
-        setErrorMsg("Full name is required to process your reservation.");
-        return;
+      const errors: Record<string, string> = {};
+      
+      if (form.name.trim().length < 3) {
+        errors.name = "Full name must be at least 3 characters.";
       }
       if (!form.contact.trim()) {
-        setErrorMsg("A contact number is required so we can reach you.");
-        return;
+        errors.contact = "Contact number is required.";
+      } else if (!isValidPhone(form.contact)) {
+        errors.contact = "Please enter a valid mobile number (e.g., 09123456789).";
       }
       if (!form.email.trim()) {
-        setErrorMsg("Email address is required for your booking confirmation.");
-        return;
+        errors.email = "Email address is required.";
+      } else if (!isValidEmail(form.email)) {
+        errors.email = "Please enter a valid email address.";
       }
-      if (!isValidEmail(form.email)) {
-        setErrorMsg("Please enter a valid email address.");
+
+      if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        setErrorMsg("Please correct the errors in the form.");
         return;
       }
     }
@@ -508,48 +520,60 @@ export function BookingModal({ villaId, onClose }: Props) {
                       >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div>
-                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${errorMsg && !form.name.trim() ? 'text-red-500' : 'text-plum/60'}`}>
+                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${validationErrors.name ? 'text-red-500' : 'text-plum/60'}`}>
                               <User className="size-3" strokeWidth={1.5} /> Full Name
                             </label>
                             <div className="relative">
                               <input
                                 value={form.name}
-                                onChange={(e) => { update("name", e.target.value); setErrorMsg(""); }}
+                                onChange={(e) => { 
+                                  update("name", e.target.value); 
+                                  if (validationErrors.name) setValidationErrors(v => ({ ...v, name: "" }));
+                                }}
                                 placeholder="e.g. Juan dela Cruz"
-                                className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && !form.name.trim() ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
+                                className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${validationErrors.name ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
                               />
                               <User className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-plum/20" strokeWidth={1} />
                             </div>
+                            {validationErrors.name && <p className="mt-2 text-[9px] text-red-500 uppercase tracking-widest">{validationErrors.name}</p>}
                           </div>
                           <div>
-                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${errorMsg && !form.contact.trim() ? 'text-red-500' : 'text-plum/60'}`}>
+                            <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${validationErrors.contact ? 'text-red-500' : 'text-plum/60'}`}>
                               <Phone className="size-3" strokeWidth={1.5} /> Contact Number
                             </label>
                             <div className="relative">
                               <input
                                 value={form.contact}
-                                onChange={(e) => { update("contact", e.target.value); setErrorMsg(""); }}
-                                placeholder="+63 9xx xxx xxxx"
-                                className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && !form.contact.trim() ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
+                                onChange={(e) => { 
+                                  update("contact", e.target.value); 
+                                  if (validationErrors.contact) setValidationErrors(v => ({ ...v, contact: "" }));
+                                }}
+                                placeholder="0912 345 6789"
+                                className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${validationErrors.contact ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
                               />
                               <Phone className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-plum/20" strokeWidth={1} />
                             </div>
+                            {validationErrors.contact && <p className="mt-2 text-[9px] text-red-500 uppercase tracking-widest">{validationErrors.contact}</p>}
                           </div>
                         </div>
                         <div>
-                          <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${errorMsg && (!form.email.trim() || !isValidEmail(form.email)) ? 'text-red-500' : 'text-plum/60'}`}>
+                          <label className={`mb-3 block text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 ${validationErrors.email ? 'text-red-500' : 'text-plum/60'}`}>
                             <Mail className="size-3" strokeWidth={1.5} /> Email Address
                           </label>
                           <div className="relative">
                             <input
                               type="email"
                               value={form.email}
-                              onChange={(e) => { update("email", e.target.value); setErrorMsg(""); }}
+                              onChange={(e) => { 
+                                update("email", e.target.value); 
+                                if (validationErrors.email) setValidationErrors(v => ({ ...v, email: "" }));
+                              }}
                               placeholder="juan@email.com"
-                              className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${errorMsg && (!form.email.trim() || !isValidEmail(form.email)) ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
+                              className={`w-full border bg-white/50 pl-12 pr-6 py-4.5 text-sm font-medium text-plum outline-none focus:border-blush focus:bg-white transition-all ${validationErrors.email ? 'border-red-300 shadow-[0_0_0_1px_rgba(239,68,68,0.1)]' : 'border-plum/10'}`}
                             />
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-plum/20" strokeWidth={1} />
                           </div>
+                          {validationErrors.email && <p className="mt-2 text-[9px] text-red-500 uppercase tracking-widest">{validationErrors.email}</p>}
                         </div>
                         <div>
                           <label className="mb-3 block text-[10px] uppercase tracking-[0.25em] text-plum/60 flex items-center gap-2">
