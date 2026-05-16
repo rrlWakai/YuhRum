@@ -29,7 +29,16 @@ import {
   Home,
   Waves,
   Plus,
+  Sun,
+  Moon,
+  Sunrise,
 } from "lucide-react";
+
+const STAY_LABELS: Record<string, { label: string; Icon: React.ElementType }> = {
+  dayStay: { label: "Day Stay", Icon: Sun },
+  nightStay: { label: "Night Stay", Icon: Moon },
+  overnight: { label: "Overnight", Icon: Sunrise },
+};
 
 const emptyRoom = {
   name: "",
@@ -308,8 +317,8 @@ export function AdminPage() {
                 <thead className="bg-[#F7F6F4] text-[10px] uppercase tracking-[0.15em] text-gray-500">
                   <tr>
                     <th className="px-6 py-4 font-semibold">Guest</th>
+                    <th className="px-6 py-4 font-semibold">Package</th>
                     <th className="px-6 py-4 font-semibold">Check In</th>
-                    <th className="px-6 py-4 font-semibold">Check Out</th>
                     <th className="px-6 py-4 font-semibold">Total</th>
                     <th className="px-6 py-4 font-semibold">Status</th>
                   </tr>
@@ -320,8 +329,18 @@ export function AdminPage() {
                       <td className="px-6 py-4 font-medium text-[#0A192F]">
                         {b.guest_name}
                       </td>
+                      <td className="px-6 py-4 text-gray-600">
+                        <div className="flex items-center gap-1.5">
+                          {b.stay_type && STAY_LABELS[b.stay_type] && (
+                            <>
+                              <span className="text-[#0A192F]">
+                                {STAY_LABELS[b.stay_type].label}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-6 py-4 text-gray-600">{b.check_in}</td>
-                      <td className="px-6 py-4 text-gray-600">{b.check_out}</td>
                       <td className="px-6 py-4 text-gray-600">
                         {fmt(b.total_price)}
                       </td>
@@ -380,8 +399,12 @@ export function AdminPage() {
                     className="border-l-4 border-#0A192F bg-white border-y border-r border-gray-200 p-5 shadow-sm"
                   >
                     <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-0.1em text-[#0A192F]">
-                      <Calendar className="size-4" /> {b.check_in} —{" "}
-                      {b.check_out}
+                      <Calendar className="size-4" /> {b.check_in}
+                      {b.stay_type && (
+                        <span className="ml-auto bg-gray-100 px-2 py-0.5 rounded text-[9px]">
+                          {STAY_LABELS[b.stay_type]?.label}
+                        </span>
+                      )}
                     </div>
                     <p className="font-serif text-xl text-[#0A192F]">
                       {b.guest_name}
@@ -400,7 +423,8 @@ export function AdminPage() {
               <thead className="bg-[#F7F6F4] text-[10px] uppercase tracking-[0.15em] text-gray-500">
                 <tr>
                   <th className="px-6 py-4 font-semibold">Guest Details</th>
-                  <th className="px-6 py-4 font-semibold">Stay Dates</th>
+                  <th className="px-6 py-4 font-semibold">Stay Details</th>
+                  <th className="px-6 py-4 font-semibold">Package</th>
                   <th className="px-6 py-4 font-semibold">Pricing</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
                   <th className="px-6 py-4 font-semibold text-right">
@@ -419,11 +443,17 @@ export function AdminPage() {
                       <p className="text-xs text-gray-500">{b.phone || "—"}</p>
                     </td>
                     <td className="px-6 py-4 text-gray-600">
-                      {b.check_in} to <br />
-                      {b.check_out}
+                      {b.check_in}
                       <p className="text-xs text-gray-400 mt-1">
                         {b.guests} pax
                       </p>
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-medium">
+                          {STAY_LABELS[b.stay_type]?.label || b.stay_type}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 font-medium text-[#0A192F]">
                       {fmt(b.total_price)}

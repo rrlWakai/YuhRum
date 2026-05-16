@@ -20,8 +20,10 @@ export type Booking = {
   guest_name: string;
   email: string;
   phone?: string;
+  villa_id: string;
   check_in: string;
   check_out: string;
+  stay_type: 'dayStay' | 'nightStay' | 'overnight';
   guests: number;
   total_price: number;
   status: 'pending' | 'confirmed' | 'cancelled';

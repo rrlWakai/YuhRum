@@ -42,6 +42,14 @@ function errorResponse(code: string, message: string, status = 400, extraHeaders
   return jsonResponse(body, status, extraHeaders);
 }
 
+function logReject(code: string, message: string, context: Record<string, unknown> = {}) {
+  console.warn("create-paymongo-checkout rejected request", {
+    code,
+    message,
+    ...context,
+  });
+}
+
 function getAllowedOrigins(): string[] {
   const configured = Deno.env.get("ALLOWED_ORIGINS");
   if (!configured) return DEFAULT_ALLOWED_ORIGINS;
@@ -99,15 +107,18 @@ serve(async (req: Request) => {
   }
 
   if (req.method !== "POST") {
+    logReject("METHOD_NOT_ALLOWED", "Only POST is allowed.", { method: req.method });
     return errorResponse("METHOD_NOT_ALLOWED", "Only POST is allowed.", 405, corsHeaders);
   }
 
   const paymongoSecret = Deno.env.get("PAYMONGO_SECRET_KEY");
   const siteUrl = Deno.env.get("SITE_URL");
   if (!paymongoSecret) {
+    logReject("SERVER_CONFIG_ERROR", "Missing PAYMONGO_SECRET_KEY");
     return errorResponse("SERVER_CONFIG_ERROR", "Payment service is unavailable.", 500, corsHeaders);
   }
   if (!siteUrl) {
+    logReject("SERVER_CONFIG_ERROR", "Missing SITE_URL");
     return errorResponse("SERVER_CONFIG_ERROR", "Missing SITE_URL configuration.", 500, corsHeaders);
   }
 
@@ -115,15 +126,26 @@ serve(async (req: Request) => {
   try {
     parsed = await req.json();
   } catch {
+    logReject("INVALID_JSON", "Malformed JSON payload");
     return errorResponse("INVALID_JSON", "Malformed JSON payload.", 400, corsHeaders);
   }
 
   if (!isCheckoutRequest(parsed)) {
+    logReject("INVALID_PAYLOAD", "Request payload shape is invalid", {
+      parsedType: typeof parsed,
+    });
     return errorResponse("INVALID_PAYLOAD", "Request payload is invalid.", 400, corsHeaders);
   }
 
   const validationError = validatePayload(parsed);
   if (validationError) {
+    logReject("VALIDATION_ERROR", validationError, {
+      amount: parsed.amount,
+      email: parsed.email,
+      hasReferenceNumber: Boolean(parsed.referenceNumber?.trim()),
+      hasDescription: Boolean(parsed.description?.trim()),
+      hasName: Boolean(parsed.name?.trim()),
+    });
     return errorResponse("VALIDATION_ERROR", validationError, 400, corsHeaders);
   }
 

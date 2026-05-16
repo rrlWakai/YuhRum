@@ -96,7 +96,7 @@ export function BookingModal({ villaId, onClose }: Props) {
 
   function canProceed() {
     if (step === 1)
-      return form.date && !blockedDates.has(form.date) && form.guests >= 1;
+      return form.date && !blockedDates.get(form.date)?.has(form.stayType) && form.guests >= 1;
     if (step === 2)
       return form.name.trim() && form.contact.trim() && form.email.trim();
     if (step === 3) return form.agree;
@@ -113,9 +113,9 @@ export function BookingModal({ villaId, onClose }: Props) {
       // Validate date again before proceeding
       setIsSubmitting(true);
       await refetch();
-      if (blockedDates.has(form.date)) {
+      if (blockedDates.get(form.date)?.has(form.stayType)) {
         setErrorMsg(
-          "Sorry, this date was just booked by someone else. Please select another date.",
+          "Sorry, this package was just booked by someone else for this date. Please select another date or package.",
         );
         setIsSubmitting(false);
         return;
@@ -133,9 +133,9 @@ export function BookingModal({ villaId, onClose }: Props) {
     try {
       // Final availability check before inserting
       await refetch();
-      if (blockedDates.has(form.date)) {
+      if (blockedDates.get(form.date)?.has(form.stayType)) {
         throw new Error(
-          "This date is no longer available. Please select another date.",
+          "This date and package is no longer available. Please select another.",
         );
       }
       if (!isValidEmail(form.email)) {
@@ -158,6 +158,7 @@ export function BookingModal({ villaId, onClose }: Props) {
             email: form.email,
             phone: form.contact,
             villa_id: form.selectedVillaId,
+            stay_type: form.stayType,
             check_in: form.date,
             check_out: checkOutDate,
             guests: form.guests,
@@ -456,6 +457,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                           <div className="bg-[#F7F6F4] p-1 rounded-2xl border border-gray-100">
                             <AvailabilityCalendar
                               mode="single"
+                              stayType={form.stayType}
                               selectedDate={form.date}
                               onSelect={(d) => update("date", d)}
                             />

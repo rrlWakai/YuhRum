@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useAvailability, toKey, isBefore, isWeekend } from '../lib/hooks';
+import { useAvailability, toKey, isBefore, isWeekend, type StayType } from '../lib/hooks';
 
 type Props = {
   mode?: 'single' | 'range';
   selectedDate?: string;
+  stayType?: StayType;
   onSelect?: (date: string) => void;
   onRangeSelect?: (start: string, end: string) => void;
 };
@@ -30,7 +31,7 @@ function isInRange(y: number, m: number, d: number, start: string, end: string) 
   return date > new Date(start) && date < new Date(end);
 }
 
-export function AvailabilityCalendar({ mode = 'range', selectedDate, onSelect, onRangeSelect }: Props) {
+export function AvailabilityCalendar({ mode = 'range', selectedDate, stayType = 'overnight', onSelect, onRangeSelect }: Props) {
   const { blockedDates, isLoading } = useAvailability();
   
   const today = new Date();
@@ -55,7 +56,7 @@ export function AvailabilityCalendar({ mode = 'range', selectedDate, onSelect, o
   function handleDayClick(day: number) {
     if (isLoading) return;
     const key = toKey(viewYear, viewMonth, day);
-    if (blockedDates.has(key)) return;
+    if (stayType && blockedDates.get(key)?.has(stayType)) return;
     const isPast = isBefore(viewYear, viewMonth, day, today.getFullYear(), today.getMonth(), today.getDate());
     if (isPast) return;
 
@@ -86,7 +87,7 @@ export function AvailabilityCalendar({ mode = 'range', selectedDate, onSelect, o
       viewMonth === today.getMonth() &&
       day === today.getDate();
 
-    if (blockedDates.has(key)) return 'cal-day-blocked rounded-lg';
+    if (stayType && blockedDates.get(key)?.has(stayType)) return 'cal-day-blocked rounded-lg';
     
     if (mode === 'single') {
       if (key === selectedDate) return 'cal-day-selected font-semibold';
