@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Menu, X } from 'lucide-react';
-import yuhrumLogo from '../assets/yuhrumlogo.png';
+
 import type { PageView } from '../App';
 
 type Props = {
@@ -47,51 +47,51 @@ export function Header({ page, onNavigate, onReserve, villaName }: Props) {
   const reserveVillaId = isDetail && page.type === 'detail' ? page.villaId : undefined;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur-md shadow-sm">
-      <nav className="mx-auto flex h-16 w-full max-w-[1240px] items-center justify-between px-5 md:px-10">
-        <div className="flex items-center gap-3">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-blush/30 bg-blush/95 backdrop-blur-md shadow-sm font-body">
+      <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 md:px-12 lg:px-20">
+        <div className="flex items-center gap-4">
           {!isHome && (
             <button
               onClick={() => onNavigate({ type: 'home' })}
-              className="flex size-9 items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors mr-1"
+              className="flex size-9 items-center justify-center border border-plum/10 text-plum hover:bg-plum/5 transition-colors mr-1"
               aria-label="Back"
             >
               <ArrowLeft className="size-4" />
             </button>
           )}
           <button onClick={() => onNavigate({ type: 'home' })} className="flex items-center gap-2">
-            <img src={yuhrumLogo} alt="Yuhrum Villas" className="h-9 w-auto object-contain" />
+        <span className="font-display text-xl italic text-plum tracking-wide ml-1">Yuhrum</span>
           </button>
           {isDetail && villaName && (
-            <span className="hidden text-sm text-gray-400 md:inline">
-              <span className="mx-2 text-gray-300">/</span>
-              <span className="font-medium text-neutral-700">{villaName}</span>
+            <span className="hidden text-[10px] uppercase tracking-[0.2em] text-plum/60 md:inline">
+              <span className="mx-3 opacity-30">/</span>
+              {villaName}
             </span>
           )}
         </div>
 
-        <div className="hidden items-center gap-7 text-sm font-medium text-gray-600 md:flex">
+        <div className="hidden items-center gap-8 text-[10px] font-medium uppercase tracking-[0.2em] text-plum md:flex">
           {NAV_LINKS.map((link) => (
             <button
               key={link.href}
               onClick={() => handleNavClick(link.href)}
-              className="transition-colors hover:text-neutral-950"
+              className="transition-colors hover:text-white"
             >
               {link.label}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <button
             onClick={() => onReserve(reserveVillaId)}
-            className="hidden btn-navy px-6 py-2.5 text-xs font-medium uppercase tracking-[0.15em] md:flex items-center"
+            className="hidden bg-plum text-petal px-6 py-2.5 text-[10px] font-medium uppercase tracking-[0.2em] transition-all hover:bg-shadow md:flex items-center"
           >
-            Reserve the Villa
+            Reserve
           </button>
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex size-10 items-center justify-center rounded-xl border border-gray-200 text-neutral-700 transition-colors hover:bg-gray-50 md:hidden"
+            className="flex size-10 items-center justify-center border border-plum/10 text-plum transition-colors hover:bg-plum/5 md:hidden"
             aria-label="Toggle menu"
           >
             {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -105,23 +105,23 @@ export function Header({ page, onNavigate, onReserve, villaName }: Props) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="overflow-hidden border-t border-gray-100 bg-white md:hidden"
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden border-t border-plum/10 bg-blush md:hidden"
           >
-            <div className="flex flex-col gap-1 px-5 py-4">
+            <div className="flex flex-col gap-1 px-6 py-6">
               {NAV_LINKS.map((link) => (
                 <button
                   key={link.href}
                   onClick={() => handleNavClick(link.href)}
-                  className="py-3 text-left text-sm font-medium text-gray-700 border-b border-gray-100 last:border-0 transition-colors hover:text-neutral-950"
+                  className="py-4 text-left text-sm font-medium text-plum border-b border-plum/5 last:border-0 transition-colors hover:text-white"
                 >
                   {link.label}
                 </button>
               ))}
-              <div className="pt-3">
+              <div className="pt-4">
                 <button
                   onClick={() => { setMenuOpen(false); onReserve(reserveVillaId); }}
-                  className="btn-navy w-full py-3.5 text-xs font-medium uppercase tracking-[0.15em]"
+                  className="bg-plum text-petal w-full py-3.5 text-[10px] font-medium uppercase tracking-[0.2em] hover:bg-shadow transition-all"
                 >
                   Reserve the Villa
                 </button>

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { SakuraNav } from '@/components/SakuraNav';
 import { BookingModal } from '@/components/BookingModal';
+import { Header } from '@/components/Header';
 import { CustomCursor } from '@/components/CustomCursor';
 import { villas } from '@/data/villas';
 import { AuthProvider } from '@/hooks/useAuth';
@@ -63,7 +63,7 @@ function AppContent() {
 
       <CustomCursor />
 
-      <SakuraNav
+      <Header
         page={page}
         onNavigate={navigate}
         onReserve={openBooking}
