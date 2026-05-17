@@ -14,6 +14,7 @@ const VillaDetailPage = lazy(() => import('@/pages/VillaDetailPage').then((m) =>
 const GalleryPage = lazy(() => import('@/pages/GalleryPage').then((m) => ({ default: m.GalleryPage })));
 const AdminPage = lazy(() => import('@/admin/AdminPage').then((m) => ({ default: m.AdminPage })));
 const Loader = lazy(() => import('@/components/Loader').then((m) => ({ default: m.Loader })));
+const Chatbot = lazy(() => import('@/components/Chatbot').then((m) => ({ default: m.Chatbot })));
 
 export type PageView =
   | { type: 'home' }
@@ -143,7 +144,9 @@ function AppContent() {
         </div>
       )}
 
-
+      <Suspense fallback={null}>
+        <Chatbot />
+      </Suspense>
     </>
   );
 }
