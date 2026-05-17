@@ -1,6 +1,13 @@
 import { villas } from '../src/data/villas';
 import type { ChatRequestPayload } from '../src/types/chat';
 
+declare const process: {
+  env: {
+    GEMINI_API_KEY?: string;
+    [key: string]: string | undefined;
+  };
+};
+
 type LimiterEntry = {
   count: number;
   resetAt: number;
@@ -76,7 +83,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
     const failure = sanitizeError(500, 'Service misconfigured');
     res.status(failure.status).json(failure.body);
