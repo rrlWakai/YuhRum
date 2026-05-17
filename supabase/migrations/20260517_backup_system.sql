@@ -105,3 +105,20 @@ drop trigger if exists on_booking_received_backup on public.bookings;
 create trigger on_booking_received_backup
 after insert on public.bookings
 for each row execute procedure public.trigger_auto_backup();
+
+-- Enable Realtime for all core tables so dashboard updates instantly without refresh
+begin;
+  alter publication supabase_realtime drop table if exists public.bookings;
+  alter publication supabase_realtime drop table if exists public.backups;
+  alter publication supabase_realtime drop table if exists public.backup_settings;
+  alter publication supabase_realtime drop table if exists public.rooms;
+  alter publication supabase_realtime drop table if exists public.discounts;
+  alter publication supabase_realtime drop table if exists public.amenities;
+
+  alter publication supabase_realtime add table public.bookings;
+  alter publication supabase_realtime add table public.backups;
+  alter publication supabase_realtime add table public.backup_settings;
+  alter publication supabase_realtime add table public.rooms;
+  alter publication supabase_realtime add table public.discounts;
+  alter publication supabase_realtime add table public.amenities;
+commit;

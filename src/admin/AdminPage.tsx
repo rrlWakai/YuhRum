@@ -22,6 +22,7 @@ import {
 } from "./api";
 import type { Backup } from "./api";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "../lib/supabase";
 import type { Amenity, Room, Booking, Discount } from "../types/admin";
 import yuhrumLogo from "../assets/yuhrumlogo.png";
 import {
@@ -134,7 +135,87 @@ export function AdminPage() {
       .finally(() => setLoading(false));
   }, [loggedIn]);
 
-  // Scheduled background backup check (Lazy Cron)
+  // Realtime Supabase Database Subscriptions
+  useEffect(() => {
+    if (!loggedIn) return;
+
+    console.log("Subscribing to realtime database changes...");
+    const channel = supabase
+      .channel("db-realtime-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, (payload) => {
+        if (payload.eventType === "INSERT") {
+          setBookings((prev) => {
+            if (prev.some((b) => b.id === payload.new.id)) return prev;
+            return [payload.new as Booking, ...prev];
+          });
+        } else if (payload.eventType === "UPDATE") {
+          setBookings((prev) => prev.map((b) => (b.id === payload.new.id ? (payload.new as Booking) : b)));
+        } else if (payload.eventType === "DELETE") {
+          setBookings((prev) => prev.filter((b) => b.id !== payload.old.id));
+        }
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "backups" }, (payload) => {
+        if (payload.eventType === "INSERT") {
+          setBackups((prev) => {
+            if (prev.some((b) => b.id === payload.new.id)) return prev;
+            return [payload.new as Backup, ...prev];
+          });
+        } else if (payload.eventType === "UPDATE") {
+          setBackups((prev) => prev.map((b) => (b.id === payload.new.id ? (payload.new as Backup) : b)));
+        } else if (payload.eventType === "DELETE") {
+          setBackups((prev) => prev.filter((b) => b.id !== payload.old.id));
+        }
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "backup_settings" }, (payload) => {
+        if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+          const s = payload.new as { key: string; value: string };
+          setBackupSettings((prev) => ({ ...prev, [s.key]: s.value }));
+        }
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "rooms" }, (payload) => {
+        if (payload.eventType === "INSERT") {
+          setRooms((prev) => {
+            if (prev.some((r) => r.id === payload.new.id)) return prev;
+            return [payload.new as Room, ...prev];
+          });
+        } else if (payload.eventType === "UPDATE") {
+          setRooms((prev) => prev.map((r) => (r.id === payload.new.id ? (payload.new as Room) : r)));
+        } else if (payload.eventType === "DELETE") {
+          setRooms((prev) => prev.filter((r) => r.id !== payload.old.id));
+        }
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "discounts" }, (payload) => {
+        if (payload.eventType === "INSERT") {
+          setDiscounts((prev) => {
+            if (prev.some((d) => d.id === payload.new.id)) return prev;
+            return [payload.new as Discount, ...prev];
+          });
+        } else if (payload.eventType === "UPDATE") {
+          setDiscounts((prev) => prev.map((d) => (d.id === payload.new.id ? (payload.new as Discount) : d)));
+        } else if (payload.eventType === "DELETE") {
+          setDiscounts((prev) => prev.filter((d) => d.id !== payload.old.id));
+        }
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "amenities" }, (payload) => {
+        if (payload.eventType === "INSERT") {
+          setAmenities((prev) => {
+            if (prev.some((a) => a.id === payload.new.id)) return prev;
+            return [payload.new as Amenity, ...prev];
+          });
+        } else if (payload.eventType === "UPDATE") {
+          setAmenities((prev) => prev.map((a) => (a.id === payload.new.id ? (payload.new as Amenity) : a)));
+        } else if (payload.eventType === "DELETE") {
+          setAmenities((prev) => prev.filter((a) => a.id !== payload.old.id));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [loggedIn]);
+
+  // Scheduled background background backup check (Lazy Cron)
   useEffect(() => {
     if (loading || backups.length === 0) return;
 
