@@ -1,6 +1,18 @@
 import { useMemo } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ChevronDown, ExternalLink, Phone, Mail, ArrowRight } from "lucide-react";
+import {
+  ChevronDown,
+  ExternalLink,
+  Phone,
+  Mail,
+  ArrowRight,
+  Wifi,
+  Compass,
+  ChefHat,
+  Sparkles,
+  Flame,
+  Waves,
+} from "lucide-react";
 
 import { villas } from "../data/villas";
 import type { PageView } from "../App";
@@ -217,6 +229,79 @@ export function HomePage({ onNavigate, onReserve }: Props) {
           {villas.map((_, i) => (
             <div key={i} className={`h-px transition-all duration-300 ${i === 0 ? 'w-8 bg-plum' : 'w-4 bg-plum/25'}`} />
           ))}
+        </div>
+      </section>
+
+      {/* ═══ AMENITIES — premium light/cream background with rich interactive hover grid ═══ */}
+      <section id="amenities" className="py-24 md:py-32 bg-white border-t border-blush/20">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
+          <Reveal className="mb-16">
+            <p className="font-body text-[9px] uppercase tracking-[0.4em] text-shadow/50 mb-4">Sanctuary Luxuries</p>
+            <h2 className="font-display text-5xl italic text-plum md:text-6xl mb-6">
+              Details designed<br />for stillness.
+            </h2>
+            <p className="font-body text-sm text-shadow max-w-lg leading-relaxed">
+              Every space in Yuhrum is packed with high-end provisions so you never have to step outside your private oasis.
+            </p>
+          </Reveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Waves,
+                title: "Private Natural Pool",
+                desc: "Exclusively yours. High-filtration deep-water dipping pool with bespoke night ambiance lighting.",
+              },
+              {
+                icon: Wifi,
+                title: "Starlink High-Speed Wi-Fi",
+                desc: "Ultra-fast satellite connectivity and cinematic outdoor/indoor theater projection configurations.",
+              },
+              {
+                icon: Compass,
+                title: "Bespoke Concierge Butler",
+                desc: "Dedicated personal host to curate your stay, organize bonfires, and orchestrate private dining setups.",
+              },
+              {
+                icon: ChefHat,
+                title: "Alfresco Teak Kitchen",
+                desc: "Fully integrated gas grills, premium refrigerators, stone prep surfaces, and outdoor dining bar.",
+              },
+              {
+                icon: Sparkles,
+                title: "Wellness Sunken Tub",
+                desc: "Relaxing natural wood-accented outdoor bathtubs, private massage pavilions, and relaxation decks.",
+              },
+              {
+                icon: Compass, // Replaced Flame with Compass/Sparkles or flame as imported
+                title: "Celestial Bonfire Area",
+                desc: "Handcrafted natural stone fire pits under a canopy of stars, pre-stacked with wood and plush seating.",
+              },
+            ].map((amenity, idx) => {
+              // Ensure we use Flame for the bonfire
+              const IconComp = idx === 5 ? Flame : amenity.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.6, delay: idx * 0.1, ease }}
+                  className="group relative border border-blush/10 bg-petal/30 p-8 transition-all duration-300 hover:border-plum/20 hover:bg-petal/60 hover:shadow-sm"
+                >
+                  <div className="mb-6 flex size-12 items-center justify-center border border-blush/20 bg-white text-plum transition-all duration-500 group-hover:bg-plum group-hover:text-petal">
+                    <IconComp className="size-5 transition-transform duration-500 group-hover:scale-110" strokeWidth={1} />
+                  </div>
+                  <h3 className="font-display text-xl italic text-plum mb-3 group-hover:text-gold transition-colors">
+                    {amenity.title}
+                  </h3>
+                  <p className="font-body text-xs text-shadow leading-relaxed">
+                    {amenity.desc}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
