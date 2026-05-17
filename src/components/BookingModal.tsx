@@ -605,7 +605,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                         </div>
 
                         <div>
-                          <label className="mb-4 block text-[10px] uppercase tracking-[0.25em] text-plum/60">Payment Method</label>
+                          <label className="mb-4 block text-[10px] font-semibold uppercase tracking-[0.25em] text-plum/80">Payment Method</label>
                           <div className="grid grid-cols-2 gap-4">
                             {(["gcash", "card"] as const).map((method) => {
                               const active = form.payMethod === method;
@@ -617,13 +617,13 @@ export function BookingModal({ villaId, onClose }: Props) {
                                   className={`flex flex-col items-center justify-center p-8 border transition-all duration-300 ${
                                     active
                                       ? "border-plum bg-plum text-petal"
-                                      : "border-plum/10 bg-white/50 text-plum hover:border-plum/30"
+                                      : "border-plum/20 bg-white/70 text-plum hover:border-plum/40 hover:bg-white"
                                   }`}
                                 >
                                   {method === "gcash" ? (
-                                    <Smartphone className={`size-6 mb-3 ${active ? "text-blush" : "text-plum/30"}`} strokeWidth={1} />
+                                    <Smartphone className={`size-6 mb-3 ${active ? "text-blush" : "text-plum/60"}`} strokeWidth={1.5} />
                                   ) : (
-                                    <CreditCard className={`size-6 mb-3 ${active ? "text-blush" : "text-plum/30"}`} strokeWidth={1} />
+                                    <CreditCard className={`size-6 mb-3 ${active ? "text-blush" : "text-plum/60"}`} strokeWidth={1.5} />
                                   )}
                                   <span className="text-[10px] font-bold uppercase tracking-[0.15em]">
                                     {method === "gcash" ? "GCash" : "Visa / Mastercard"}
@@ -644,13 +644,13 @@ export function BookingModal({ villaId, onClose }: Props) {
                             />
                             <Check className="absolute size-3.5 text-petal opacity-0 peer-checked:opacity-100 transition-opacity" />
                           </div>
-                          <span className="text-[11px] leading-relaxed text-plum/70 font-body">
-                            I agree to the <span className="text-plum font-semibold underline decoration-blush/40 underline-offset-4">Terms and Conditions</span> and Cancellation Policy. I understand that my booking is subject to final confirmation.
+                          <span className="text-xs leading-relaxed text-plum/90 font-body">
+                            I agree to the <span className="text-plum font-bold underline decoration-plum/40 underline-offset-4">Terms and Conditions</span> and Cancellation Policy. I understand that my booking is subject to final confirmation.
                           </span>
                         </label>
 
-                        <div className="flex items-center justify-center gap-3 text-[9px] uppercase tracking-[0.2em] text-plum/40">
-                          <Shield className="size-4 opacity-50" strokeWidth={1} />
+                        <div className="flex items-center justify-center gap-3 text-[10px] font-medium uppercase tracking-[0.2em] text-plum/70">
+                          <Shield className="size-4 opacity-70" strokeWidth={1.5} />
                           Encrypted payment secured by PayMongo
                         </div>
                       </motion.div>
