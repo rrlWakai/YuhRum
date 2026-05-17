@@ -13,7 +13,14 @@ import {
   updateRoom,
   updateBookingStatus,
   toggleDiscountActive,
+  getBackups,
+  getBackupSettings,
+  updateBackupSetting,
+  deleteBackup,
+  generateBackup,
+  restoreBackup,
 } from "./api";
+import type { Backup } from "./api";
 import { useAuth } from "@/hooks/useAuth";
 import type { Amenity, Room, Booking, Discount } from "../types/admin";
 import yuhrumLogo from "../assets/yuhrumlogo.png";
@@ -32,6 +39,13 @@ import {
   Sun,
   Moon,
   Sunrise,
+  Database,
+  Download,
+  RefreshCw,
+  Play,
+  CheckCircle,
+  ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 
 const STAY_LABELS: Record<string, { label: string; Icon: React.ElementType }> = {
@@ -63,7 +77,8 @@ type Tab =
   | "bookings"
   | "discounts"
   | "spaces"
-  | "amenities";
+  | "amenities"
+  | "backups";
 
 export function AdminPage() {
   const { user, signOut } = useAuth();
@@ -75,6 +90,14 @@ export function AdminPage() {
   const [amenities, setAmenities] = useState<Amenity[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [backups, setBackups] = useState<Backup[]>([]);
+  const [backupSettings, setBackupSettings] = useState<Record<string, string>>({
+    backup_frequency: "daily",
+    auto_backup_on_booking: "true",
+  });
+  const [isGeneratingBackup, setIsGeneratingBackup] = useState(false);
+  const [isRestoringBackup, setIsRestoringBackup] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   const [tab, setTab] = useState<Tab>("overview");
 
@@ -88,16 +111,127 @@ export function AdminPage() {
   useEffect(() => {
     if (!loggedIn) return;
     setLoading(true);
-    void getAdminData()
-      .then((data) => {
+
+    Promise.all([
+      getAdminData(),
+      getBackups(),
+      getBackupSettings(),
+    ])
+      .then(([data, backupData, settingsData]) => {
         setRooms(data.rooms);
         setAmenities(data.amenities);
         setBookings(data.bookings);
         setDiscounts(data.discounts);
+        setBackups(backupData);
+
+        const settingsMap: Record<string, string> = {};
+        settingsData.forEach((s) => {
+          settingsMap[s.key] = s.value;
+        });
+        setBackupSettings((prev) => ({ ...prev, ...settingsMap }));
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, [loggedIn]);
+
+  // Scheduled background backup check (Lazy Cron)
+  useEffect(() => {
+    if (loading || backups.length === 0) return;
+
+    const freq = backupSettings.backup_frequency || "daily";
+    if (freq === "manual") return;
+
+    const scheduledBackups = backups.filter((b) => b.backup_type === freq);
+    const lastBackup = scheduledBackups[0]; // Already sorted descending
+
+    let due = false;
+    const now = Date.now();
+    if (!lastBackup) {
+      due = true;
+    } else {
+      const lastTime = new Date(lastBackup.created_at).getTime();
+      const diffMs = now - lastTime;
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+      if (freq === "daily" && diffDays >= 1) {
+        due = true;
+      } else if (freq === "weekly" && diffDays >= 7) {
+        due = true;
+      }
+    }
+
+    if (due) {
+      console.log(`Auto-triggering scheduled ${freq} database backup...`);
+      generateBackup(freq as "daily" | "weekly")
+        .then((newB) => {
+          setBackups((prev) => [newB, ...prev]);
+        })
+        .catch((err) => console.error("Auto scheduled backup failed:", err));
+    }
+  }, [backups, backupSettings, loading]);
+
+  const handleManualBackup = async () => {
+    setError("");
+    setSuccessMsg("");
+    setIsGeneratingBackup(true);
+    try {
+      const newBackup = await generateBackup("manual");
+      setBackups((prev) => [newBackup, ...prev]);
+      setSuccessMsg("Manual database backup successfully generated!");
+    } catch (err: any) {
+      setError(`Backup failed: ${err.message}`);
+    } finally {
+      setIsGeneratingBackup(false);
+    }
+  };
+
+  const handleRestore = async (backup: Backup) => {
+    if (
+      !confirm(
+        `WARNING: This will replace the entire active database table records (Bookings, Rooms, Discounts, Amenities) with the state captured in ${backup.filename}. Are you absolutely sure you want to proceed?`
+      )
+    ) {
+      return;
+    }
+
+    setError("");
+    setSuccessMsg("");
+    setIsRestoringBackup(true);
+    try {
+      await restoreBackup(backup);
+      setSuccessMsg(`Database state successfully restored from ${backup.filename}!`);
+      // Reload admin page data
+      const data = await getAdminData();
+      setRooms(data.rooms);
+      setAmenities(data.amenities);
+      setBookings(data.bookings);
+      setDiscounts(data.discounts);
+    } catch (err: any) {
+      setError(`Restore failed: ${err.message}`);
+    } finally {
+      setIsRestoringBackup(false);
+    }
+  };
+
+  const handleBackupSettingChange = async (key: string, value: string) => {
+    try {
+      await updateBackupSetting(key, value);
+      setBackupSettings((prev) => ({ ...prev, [key]: value }));
+      setSuccessMsg("Backup configuration updated successfully!");
+      setTimeout(() => setSuccessMsg(""), 3000);
+    } catch (err: any) {
+      setError(`Failed to update setting: ${err.message}`);
+    }
+  };
+
+  const handleDownloadBackup = (backup: Backup) => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup.data, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", backup.filename);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
 
   // Inactivity timeout: 20 minutes
   useEffect(() => {
@@ -195,6 +329,7 @@ export function AdminPage() {
     { id: "discounts", label: "Discounts", icon: Tag },
     { id: "spaces", label: "Villa Spaces", icon: Home },
     { id: "amenities", label: "Amenities", icon: Waves },
+    { id: "backups", label: "DB Backups", icon: Database },
   ];
 
   return (
@@ -260,8 +395,15 @@ export function AdminPage() {
             </p>
           )}
           {error && (
-            <p className="mt-4 border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+            <p className="mt-4 border border-red-200 bg-red-50 p-4 text-sm text-red-600 flex items-center gap-3">
+              <AlertTriangle className="size-4 shrink-0" />
               {error}
+            </p>
+          )}
+          {successMsg && (
+            <p className="mt-4 border border-green-200 bg-green-50 p-4 text-sm text-green-700 flex items-center gap-3">
+              <CheckCircle className="size-4 shrink-0" />
+              {successMsg}
             </p>
           )}
         </div>
@@ -893,6 +1035,202 @@ export function AdminPage() {
                   </div>
                 </article>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* BACKUPS TAB */}
+        {tab === "backups" && (
+          <div className="space-y-8 font-body">
+            {/* Summary & Manual action */}
+            <div className="grid gap-6 md:grid-cols-3">
+              <div className="border border-blush/20 bg-white p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-shadow/70">Auto-Backup Status</p>
+                  <p className="mt-2 font-display italic text-2xl text-plum">
+                    {backupSettings.auto_backup_on_booking === "true" ? "Fully Active" : "Disabled"}
+                  </p>
+                </div>
+                <div className="mt-4 flex items-center gap-2">
+                  <span className={`size-2.5 rounded-full ${backupSettings.auto_backup_on_booking === "true" ? "bg-green-500 animate-pulse" : "bg-gray-400"}`} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-shadow/60">
+                    Triggers on new Booking
+                  </span>
+                </div>
+              </div>
+
+              <div className="border border-blush/20 bg-white p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-shadow/70">Scheduled Frequency</p>
+                  <p className="mt-2 font-display italic text-2xl text-plum capitalize">
+                    {backupSettings.backup_frequency || "daily"}
+                  </p>
+                </div>
+                <div className="mt-4 text-[10px] font-bold uppercase tracking-wider text-shadow/60">
+                  Default setting: Daily
+                </div>
+              </div>
+
+              <div className="border border-blush/20 bg-white p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-shadow/70">Manual Creation</p>
+                  <p className="mt-2 text-xs text-shadow/70">Create a full JSON database snapshot instantly.</p>
+                </div>
+                <button
+                  onClick={handleManualBackup}
+                  disabled={isGeneratingBackup}
+                  className="mt-4 w-full bg-plum text-petal px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] transition-all hover:bg-shadow flex justify-center items-center gap-2 disabled:opacity-50"
+                >
+                  {isGeneratingBackup ? (
+                    <>
+                      <RefreshCw className="size-3 animate-spin" /> Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="size-3" /> Backup Now
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Config Box */}
+            <div className="border border-blush/20 bg-white p-6 shadow-sm">
+              <h2 className="font-display italic text-xl text-plum border-b border-blush/10 pb-3 mb-5 flex items-center gap-2">
+                <Database className="size-4 text-blush" /> Backup Configuration Settings
+              </h2>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-shadow/70">
+                    Backup Frequency
+                  </label>
+                  <select
+                    value={backupSettings.backup_frequency || "daily"}
+                    onChange={(e) => handleBackupSettingChange("backup_frequency", e.target.value)}
+                    className="w-full border border-blush/20 bg-petal px-4 py-3 text-sm outline-none focus:border-[#0A192F]"
+                  >
+                    <option value="daily">Daily Schedule (Default)</option>
+                    <option value="weekly">Weekly Schedule</option>
+                    <option value="manual">Manual Only</option>
+                  </select>
+                  <p className="mt-2 text-[9px] uppercase tracking-widest text-shadow/50">
+                    * The system runs a lazy-cron checking when admin opens the panel, automatically creating a snapshot if due.
+                  </p>
+                </div>
+
+                <div className="flex flex-col justify-center">
+                  <label className="flex cursor-pointer items-center gap-3 p-4 border border-blush/10 bg-petal/30 rounded-xl hover:bg-petal/50 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={backupSettings.auto_backup_on_booking === "true"}
+                      onChange={(e) => handleBackupSettingChange("auto_backup_on_booking", e.target.checked ? "true" : "false")}
+                      className="size-4 border border-blush/20 rounded checked:bg-plum transition-all"
+                    />
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-plum block">
+                        Auto-Backup on Booking
+                      </span>
+                      <span className="text-[9px] uppercase tracking-widest text-shadow/60 block mt-0.5">
+                        Creates an immediate snapshot whenever a booking registration is received
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Backups List */}
+            <div className="space-y-4">
+              <h2 className="font-display italic text-xl text-plum border-b border-blush/20 pb-3 flex items-center gap-2">
+                <ShieldCheck className="size-5 text-green-600" /> Database Backup Archives
+              </h2>
+              <div className="overflow-x-auto border border-blush/20 bg-white">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-petal text-[10px] uppercase tracking-[0.15em] text-shadow/70">
+                    <tr>
+                      <th className="px-6 py-4 font-semibold">Backup Filename</th>
+                      <th className="px-6 py-4 font-semibold">Trigger Type</th>
+                      <th className="px-6 py-4 font-semibold">Records Snapshot</th>
+                      <th className="px-6 py-4 font-semibold">Generated At</th>
+                      <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {backups.map((b) => (
+                      <tr key={b.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 font-medium text-plum select-all">
+                          {b.filename}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`inline-block border px-2 py-1 text-[9px] uppercase tracking-wider font-bold ${
+                              b.backup_type === "auto"
+                                ? "border-green-200 bg-green-50 text-green-700"
+                                : b.backup_type === "daily"
+                                  ? "border-purple-200 bg-purple-50 text-purple-700"
+                                  : b.backup_type === "weekly"
+                                    ? "border-pink-200 bg-pink-50 text-pink-700"
+                                    : "border-blue-200 bg-blue-50 text-blue-700"
+                            }`}
+                          >
+                            {b.backup_type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-xs text-shadow">
+                          <div className="flex flex-wrap gap-2">
+                            <span className="bg-gray-100 px-2 py-0.5 rounded">Bookings: {b.record_counts?.bookings ?? 0}</span>
+                            <span className="bg-gray-100 px-2 py-0.5 rounded">Rooms: {b.record_counts?.rooms ?? 0}</span>
+                            <span className="bg-gray-100 px-2 py-0.5 rounded">Discounts: {b.record_counts?.discounts ?? 0}</span>
+                            <span className="bg-gray-100 px-2 py-0.5 rounded">Amenities: {b.record_counts?.amenities ?? 0}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-xs text-shadow">
+                          {new Date(b.created_at).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-3">
+                            <button
+                              onClick={() => handleDownloadBackup(b)}
+                              title="Download Backup JSON File"
+                              className="text-shadow/60 hover:text-plum transition-colors p-1.5 border border-blush/10 bg-petal/20 rounded hover:bg-petal/50"
+                            >
+                              <Download className="size-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleRestore(b)}
+                              disabled={isRestoringBackup}
+                              title="Restore Entire Database to this state"
+                              className="text-orange-600 hover:text-orange-700 disabled:opacity-50 transition-colors p-1.5 border border-orange-200 bg-orange-50 rounded hover:bg-orange-100 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider"
+                            >
+                              <RefreshCw className={`size-3.5 ${isRestoringBackup ? "animate-spin" : ""}`} /> Restore
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm("Permanently delete this backup archive?")) {
+                                  await deleteBackup(b.id);
+                                  setBackups((prev) => prev.filter((item) => item.id !== b.id));
+                                  setSuccessMsg("Backup successfully deleted.");
+                                }
+                              }}
+                              title="Delete Backup Record"
+                              className="text-shadow/50 hover:text-red-600 transition-colors p-1.5 border border-blush/10 bg-petal/20 rounded hover:bg-petal/50"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {backups.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-8 text-center text-shadow/70">
+                          No backup archives exist yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

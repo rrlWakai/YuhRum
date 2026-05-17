@@ -1,6 +1,7 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BookingModal } from '@/components/BookingModal';
+import { SuccessPage } from '@/pages/SuccessPage';
 import { Header } from '@/components/Header';
 import { CustomCursor } from '@/components/CustomCursor';
 import { villas } from '@/data/villas';
@@ -24,6 +25,38 @@ function AppContent() {
   const [page, setPage] = useState<PageView>({ type: 'home' });
   const [bookingVillaId, setBookingVillaId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [paymentSuccessRef, setPaymentSuccessRef] = useState<string | null>(null);
+  const [showCancelledToast, setShowCancelledToast] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get('payment');
+    const ref = params.get('ref');
+
+    if (paymentStatus === 'success' && ref) {
+      setPaymentSuccessRef(ref);
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (paymentStatus === 'cancelled') {
+      setShowCancelledToast(true);
+      window.history.replaceState({}, '', window.location.pathname);
+      const timer = setTimeout(() => setShowCancelledToast(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  function handleReturnHome() {
+    setPaymentSuccessRef(null);
+    setPage({ type: 'home' });
+  }
+
+  if (paymentSuccessRef) {
+    return (
+      <SuccessPage
+        bookingId={paymentSuccessRef}
+        onReturnHome={handleReturnHome}
+      />
+    );
+  }
 
   if (window.location.pathname.startsWith('/admin')) {
     return (
@@ -102,6 +135,13 @@ function AppContent() {
 
       {bookingVillaId && (
         <BookingModal villaId={bookingVillaId} onClose={closeBooking} />
+      )}
+
+      {showCancelledToast && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] border border-plum/20 bg-petal/90 backdrop-blur-md px-6 py-4 rounded-xl shadow-2xl text-xs font-semibold uppercase tracking-widest text-plum flex items-center gap-3">
+          <span className="size-2 rounded-full bg-blush animate-pulse" />
+          Reservation cancelled. Your spot is still available.
+        </div>
       )}
 
       <Suspense fallback={null}>
