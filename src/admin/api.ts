@@ -69,6 +69,11 @@ export async function updateBookingStatus(id: string, status: 'pending' | 'confi
   return handleResponse<Booking>(data, error);
 }
 
+export async function updateBooking(id: string, booking: Partial<Booking>) {
+  const { data, error } = await supabase.from('bookings').update(booking).eq('id', id).select().single();
+  return handleResponse<Booking>(data, error);
+}
+
 export async function deleteBooking(id: string) {
   const { error } = await supabase.from('bookings').delete().eq('id', id);
   if (error) throw new Error(error.message);
