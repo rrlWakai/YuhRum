@@ -51,10 +51,10 @@ const experiences = [
 const galleryImages = [
   { src: "https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=800&q=80", location: "Villa Serena" },
   { src: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80", location: "Private Pool" },
-  { src: "https://images.unsplash.com/photo-1501117716987-c8e1ecb21076?auto=format&fit=crop&w=800&q=80", location: "Sunset Terrace" },
+  { src: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80", location: "Sunset Terrace" },
   { src: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80", location: "Villa Verde" },
-  { src: "https://images.unsplash.com/photo-1602002418672-43121356dc46?auto=format&fit=crop&w=800&q=80", location: "Garden Estate" },
-  { src: "https://images.unsplash.com/photo-1615529162924-f8605388465d?auto=format&fit=crop&w=800&q=80", location: "The Pool House" },
+  { src: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80", location: "Garden Estate" },
+  { src: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80", location: "The Pool House" },
 ];
 
 function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
