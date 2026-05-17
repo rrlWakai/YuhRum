@@ -37,9 +37,9 @@ const STAY_LABELS: Record<
   StayType,
   { label: string; sub: string; Icon: React.ElementType }
 > = {
-  dayStay: { label: "Day Stay", sub: "8:00 AM – 5:00 PM", Icon: Sun },
-  nightStay: { label: "Night Stay", sub: "8:00 PM – 5:00 AM", Icon: Moon },
-  overnight: { label: "Overnight", sub: "2:00 PM – 12:00 PM", Icon: Sunrise },
+  dayStay: { label: "Day Stay", sub: "9:00 AM – 2:00 PM", Icon: Sun },
+  nightStay: { label: "Night Stay", sub: "3:00 PM – 8:00 PM", Icon: Moon },
+  overnight: { label: "Overnight", sub: "9:00 PM – 7:00 AM", Icon: Sunrise },
 };
 
 const STEP_LABELS = ["Stay Details", "Guest Info", "Review & Pay"];

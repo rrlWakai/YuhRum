@@ -261,9 +261,9 @@ export function VillaDetailPage({ villaId, onNavigate, onReserve }: Props) {
           {/* Package filter */}
           <div className="mt-8 flex flex-wrap gap-2">
             {[
-              { key: 'dayStay' as StayType,   label: 'Day Stay',   sub: '8am – 5pm',   Icon: Sun },
-              { key: 'nightStay' as StayType, label: 'Night Stay', sub: '8pm – 5am',   Icon: Moon },
-              { key: 'overnight' as StayType, label: 'Overnight',  sub: '2pm – 12pm',  Icon: Sunrise },
+              { key: 'dayStay' as StayType,   label: 'Day Stay',   sub: '9am – 2pm',   Icon: Sun },
+              { key: 'nightStay' as StayType, label: 'Night Stay', sub: '3pm – 8pm',   Icon: Moon },
+              { key: 'overnight' as StayType, label: 'Overnight',  sub: '9pm – 7am',  Icon: Sunrise },
             ].map(({ key, label, sub, Icon }) => (
               <button
                 key={key}

@@ -30,9 +30,9 @@ type BookingDetails = {
 };
 
 const STAY_LABELS: Record<string, { label: string; time: string }> = {
-  dayStay: { label: "Day Stay", time: "8:00 AM – 5:00 PM" },
-  nightStay: { label: "Night Stay", time: "8:00 PM – 5:00 AM" },
-  overnight: { label: "Overnight", time: "2:00 PM – 12:00 PM (Next Day)" },
+  dayStay: { label: "Day Stay", time: "9:00 AM – 2:00 PM" },
+  nightStay: { label: "Night Stay", time: "3:00 PM – 8:00 PM" },
+  overnight: { label: "Overnight", time: "9:00 PM – 7:00 AM (Next Day)" },
 };
 
 function formatPrice(n: number) {
