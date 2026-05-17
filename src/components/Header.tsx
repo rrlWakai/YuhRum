@@ -36,7 +36,14 @@ export function Header({ page, onNavigate, onReserve, villaName }: Props) {
     if (href.startsWith('section:')) {
       const sectionId = href.replace('section:', '');
       if (isHome) {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+        // A slight timeout ensures the mobile menu drawer collapse animation
+        // doesn't interrupt or cancel the smooth scroll operation.
+        setTimeout(() => {
+          const el = document.getElementById(sectionId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 150);
       } else {
         onNavigate({ type: 'home' });
         setPendingSection(sectionId);
