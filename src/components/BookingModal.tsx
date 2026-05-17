@@ -600,7 +600,7 @@ export function BookingModal({ villaId, onClose }: Props) {
                         exit={{ opacity: 0, x: -10 }}
                         className="space-y-10"
                       >
-                        <div className="md:hidden border border-plum/10 p-6 bg-white/50">
+                        <div className="md:hidden bg-plum p-6 border border-plum/10">
                           <SummaryContent />
                         </div>
 
