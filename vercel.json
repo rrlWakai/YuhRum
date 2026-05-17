@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/chat.ts": {
-      "maxDuration": 10
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
