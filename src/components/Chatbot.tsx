@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, SendHorizontal, Loader2 } from 'lucide-react';
 import { useAvailability } from '../lib/hooks';
 import { getConciergeModel } from '../services/chat';
+import yuhrumLogo from '../assets/yuhrumlogo-clean.png';
 
 // Types
 export type ChatRole = 'user' | 'model' | 'system';
@@ -12,25 +13,6 @@ export type ChatMessage = {
   text: string;
   timestamp: Date;
 };
-
-// Lotus Icon Component
-function LotusIcon({ className = 'w-6 h-6' }: { className?: string }) {
-  return (
-    <svg 
-      viewBox="0 0 64 64" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M32 8C32 8 20 24 20 38C20 48 26 56 32 56C38 56 44 48 44 38C44 24 32 8 32 8Z" />
-      <path d="M32 20C32 20 26 30 26 38" />
-      <path d="M32 30C32 30 38 36 38 40" />
-    </svg>
-  );
-}
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -183,7 +165,7 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ delay: 2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-6 right-6 z-50 flex items-center justify-end"
+            className="fixed bottom-24 right-6 md:bottom-28 md:right-8 z-50 flex items-center justify-end"
           >
             {/* Tooltip */}
             <AnimatePresence>
@@ -206,10 +188,23 @@ export function Chatbot() {
               onMouseLeave={() => setShowTooltip(false)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex w-14 h-14 items-center justify-center rounded-full bg-[#2C2A25] text-[#FAF8F4] shadow-lg border border-[#FAF8F4]/10 transition-colors focus:outline-none"
+              className="flex w-14 h-14 items-center justify-center rounded-full bg-[#2C2A25] shadow-lg border border-[#FAF8F4]/10 transition-colors focus:outline-none overflow-hidden p-2.5"
               aria-label="Open Chatbot"
             >
-              <LotusIcon className="w-6 h-6 animate-pulse duration-[3000ms]" />
+              <motion.img 
+                src={yuhrumLogo} 
+                alt="Yuhrum Logo" 
+                className="w-full h-full object-contain" 
+                animate={{
+                  scale: [1, 1.08, 1],
+                  opacity: [0.9, 1, 0.9]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
             </motion.button>
           </motion.div>
         )}
@@ -223,7 +218,7 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="fixed bottom-0 right-0 w-full h-full md:bottom-6 md:right-6 md:w-[380px] md:h-[560px] md:max-h-[85vh] z-50 flex flex-col md:rounded-2xl border border-[rgba(180,170,155,0.3)] bg-[#FAF8F4] shadow-2xl overflow-hidden font-body"
+            className="fixed bottom-0 right-0 w-full h-full md:bottom-28 md:right-8 md:w-[380px] md:h-[560px] md:max-h-[85vh] z-50 flex flex-col md:rounded-2xl border border-[rgba(180,170,155,0.3)] bg-[#FAF8F4] shadow-2xl overflow-hidden font-body"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-[#E6E1DA]/60 px-5 py-4 bg-[#FAF8F4]">
@@ -248,8 +243,8 @@ export function Chatbot() {
               {messages.length === 0 ? (
                 /* Empty State */
                 <div className="flex flex-col items-center justify-center h-full py-6 select-none">
-                  <div className="w-14 h-14 rounded-full bg-[#A89880]/10 text-[#A89880]/60 flex items-center justify-center mb-4 border border-[#A89880]/15">
-                    <LotusIcon className="w-8 h-8" />
+                  <div className="w-16 h-16 rounded-full bg-[#A89880]/10 flex items-center justify-center mb-4 border border-[#A89880]/15 p-2">
+                    <img src={yuhrumLogo} alt="Yuhrum Logo" className="w-full h-full object-contain" />
                   </div>
                   <p className="font-display italic text-lg text-[#2C2A25]/70 text-center mb-6 px-4">
                     "Still waters run deep. Ask us anything."
@@ -298,8 +293,8 @@ export function Chatbot() {
                       ) : (
                         /* AI Assistant Message */
                         <div className="flex items-start gap-3.5 max-w-[90%] select-text">
-                          <div className="w-8 h-8 rounded-full bg-[#A89880]/15 text-[#A89880] flex items-center justify-center shrink-0 border border-[#A89880]/20 select-none">
-                            <LotusIcon className="w-4.5 h-4.5" />
+                          <div className="w-8 h-8 rounded-full bg-[#A89880]/15 flex items-center justify-center shrink-0 border border-[#A89880]/20 select-none p-1 overflow-hidden">
+                            <img src={yuhrumLogo} alt="Yuhrum Logo" className="w-full h-full object-contain" />
                           </div>
                           <div className="flex flex-col">
                             <div className="text-[13.5px] pr-2 pt-0.5">
@@ -321,8 +316,20 @@ export function Chatbot() {
                       animate={{ opacity: 1, y: 0 }}
                       className="flex items-start gap-3.5"
                     >
-                      <div className="w-8 h-8 rounded-full bg-[#A89880]/15 text-[#A89880] flex items-center justify-center shrink-0 border border-[#A89880]/20">
-                        <LotusIcon className="w-4.5 h-4.5 animate-spin duration-[4000ms]" />
+                      <div className="w-8 h-8 rounded-full bg-[#A89880]/15 flex items-center justify-center shrink-0 border border-[#A89880]/20 p-1 overflow-hidden">
+                        <motion.img 
+                          src={yuhrumLogo} 
+                          alt="Yuhrum Logo" 
+                          className="w-full h-full object-contain" 
+                          animate={{
+                            y: [0, -2, 0]
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        />
                       </div>
                       <div className="flex gap-1 px-3.5 py-2.5 bg-stone-200/40 rounded-xl w-fit items-center mt-0.5">
                         {[0, 1, 2].map((i) => (
