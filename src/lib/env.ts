@@ -1,8 +1,7 @@
 type PublicEnv = {
   supabaseUrl: string;
   supabaseAnonKey: string;
-    geminiApiKey: string;
-
+  openaiApiKey: string;
 };
 
 function requireEnv(value: string | undefined, key: string): string {
@@ -15,5 +14,5 @@ function requireEnv(value: string | undefined, key: string): string {
 export const env: PublicEnv = {
   supabaseUrl: requireEnv(import.meta.env.VITE_SUPABASE_URL, 'VITE_SUPABASE_URL'),
   supabaseAnonKey: requireEnv(import.meta.env.VITE_SUPABASE_ANON_KEY, 'VITE_SUPABASE_ANON_KEY'),
-  geminiApiKey: requireEnv(import.meta.env.VITE_GEMINI_API_KEY, 'VITE_GEMINI_API_KEY'),
+  openaiApiKey: requireEnv(import.meta.env.VITE_OPENAI_API_KEY, 'VITE_OPENAI_API_KEY'),
 };

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, SendHorizontal, Loader2 } from 'lucide-react';
 import { useAvailability } from '../lib/hooks';
-import { getConciergeModel } from '../services/chat';
+import { getConciergeReply } from '../services/chat';
 import yuhrumLogo from '../assets/yuhrumlogo-clean.png';
 
 // Types
@@ -74,32 +74,7 @@ export function Chatbot() {
     setIsLoading(true);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error('API Key missing');
-      }
-
-      // Format blocked dates for the assistant context
-      const formattedBlockedDates = Array.from(blockedDates.entries()).map(
-        ([date, types]) => `${date} (${Array.from(types).join(', ')})`
-      ).join(', ') || 'None';
-
-      const model = getConciergeModel(formattedBlockedDates);
-
-      // Build chat history excluding system roles
-      const chatHistory = messages
-        .filter(m => m.role !== 'system')
-        .map(m => ({
-          role: m.role === 'user' ? 'user' : 'model',
-          parts: [{ text: m.text }]
-        }));
-
-      const chat = model.startChat({
-        history: chatHistory,
-      });
-
-      const result = await chat.sendMessage(textToSend);
-      const replyText = result.response.text();
+      const replyText = getConciergeReply(textToSend, blockedDates);
 
       setMessages(prev => [...prev, {
         role: 'model',
