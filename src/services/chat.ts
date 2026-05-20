@@ -23,7 +23,7 @@ Rules for your tone and response structure:
 - If they ask about booking or reservations, guide them gently to use the Reservation button in the top header.`;
 
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-flash-latest",
     systemInstruction: {
       role: "user",
       parts: [{ text: SYSTEM_PROMPT }],
